@@ -1,10 +1,10 @@
 <h1>New Post!</h1>
 
 <form action="/posts" method="POST">
-	<div><input type="text" name="title" placeholder="Title"></div>
-	<div><input type="text" name="price" placeholder="Price"></div>
-	<div><textarea name="description" placeholder="Description"></textarea></div>
-	<div><input type="text" name="location" placeholder="Location"></div>
+	<div><input type="text" name="post[title]" placeholder="Title"></div>
+	<div><input type="text" name="post[price]" placeholder="Price"></div>
+	<div><textarea name="post[description]" placeholder="Description"></textarea></div>
+	<div><input type="text" name="post[location]" placeholder="Location"></div>
 
 	<input type="submit">
 </form>
