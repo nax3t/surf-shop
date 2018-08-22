@@ -16,6 +16,6 @@
 	- check if there are any new images for upload
 		- upload images
 			- add images to post.images array
-	- update the post with new any new properties
+	- update the post with any new properties
 	- save the updated post into the db
 	- redirect to show page
