@@ -1,21 +1,10 @@
-# Posts Edit Form
-	- update checkbox name
-	- add enctype to form
+# Adding a map to the view
 
-# Posts Update Route
-	- add upload.array()
-
-
-# Posts Update Method
-	- find the post by id
-	- check if there's any images for deletion
-		- assign deleteImages from req.body to its own variable
-		- loop over deleteImages
-			- delete images from cloudinary
-			- delete image from post.images
-	- check if there are any new images for upload
-		- upload images
-			- add images to post.images array
-	- update the post with any new properties
-	- save the updated post into the db
-	- redirect to show page
+- Add CDN's for mapbox gl js and css
+- Add a image file for the marker
+- Add style for body, map, marker, and popup
+- Create div container for map
+- Add internal script for creating our map
+	- Instantiate a new Map (with properties/options)
+	- Declare our geojson data (for markers)
+	- Iterate over geojson.features (locations) and create markers & popups

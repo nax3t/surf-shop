@@ -2,7 +2,7 @@ const Post = require('../models/post');
 const cloudinary = require('cloudinary');
 cloudinary.config({
 	cloud_name: 'devsprout',
-	api_key: '744168392144115',
+	api_key: '981296857448418',
 	api_secret: process.env.CLOUDINARY_SECRET
 });
 
