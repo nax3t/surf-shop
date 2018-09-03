@@ -1,10 +1,28 @@
-# Adding a map to the view
+# Geocoding Post Address and Adding Its Marker to the Map
 
-- Add CDN's for mapbox gl js and css
-- Add a image file for the marker
-- Add style for body, map, marker, and popup
-- Create div container for map
-- Add internal script for creating our map
-	- Instantiate a new Map (with properties/options)
-	- Declare our geojson data (for markers)
-	- Iterate over geojson.features (locations) and create markers & popups
+## Update Post Model
+- Remove lat and lng and add coordinates: Array
+
+## Update Posts Controller
+- Add the geocodingClient to top of file:
+```
+const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
+const geocodingClient = mbxGeocoding({ accessToken: process.env.MAPBOX_TOKEN });
+```
+- Update create (POST) method: 
+```
+let response = await geocodingClient
+  .forwardGeocode({
+    query: req.body.post.location,
+    limit: 1
+  })
+  .send();
+```
+- Assign the response's coordinates to req.body.post.coordinates
+- Save the post
+
+# Update the Posts Show View
+- Remove geojson object
+- Remove forEach loop over geoson.features
+- Assign post variable from EJS local variable
+- Update marker to use post instead

@@ -9,8 +9,8 @@
   }
 
   #map {
-    width: 700px;
-    height: 400px;
+    width: 350px;
+    height: 200px;
   }
 
   .marker {
@@ -54,55 +54,26 @@
 </div>
 
 <script>
-
-mapboxgl.accessToken = 'pk.eyJ1IjoiZGV2c3Byb3V0IiwiYSI6ImNqbGU4MnVoMTBqOWUzcXV2czNyeHZlaGIifQ.gkKoUoO5radbwODQOLwiVA';
+var post = <%- JSON.stringify(post) %>;
+mapboxgl.accessToken = 'pk.eyJ1IjoiZGV2c3Byb3V0IiwiYSI6ImNqbGg5MzRlcjAyZWgzd29lZ3FsYmsxZTYifQ.EyAZe_Y4SI69OeouHNcyTQ';
 
 var map = new mapboxgl.Map({
   container: 'map',
   style: 'mapbox://styles/mapbox/light-v9',
-  center: [-96, 37.8],
-  zoom: 3
+  center: post.coordinates,
+  zoom: 5
 });
 
-var geojson = {
-  type: 'FeatureCollection',
-  features: [{
-    type: 'Feature',
-    geometry: {
-      type: 'Point',
-      coordinates: [-77.032, 38.913]
-    },
-    properties: {
-      title: 'Mapbox',
-      description: 'Washington, D.C.'
-    }
-  },
-  {
-    type: 'Feature',
-    geometry: {
-      type: 'Point',
-      coordinates: [-122.414, 37.776]
-    },
-    properties: {
-      title: 'Mapbox',
-      description: 'San Francisco, California'
-    }
-  }]
-};
+// create a HTML element for our post location/marker
+var el = document.createElement('div');
+el.className = 'marker';
 
-// add markers to map
-geojson.features.forEach(function(marker) {
+// make a marker for our location and add to the map
+new mapboxgl.Marker(el)
+.setLngLat(post.coordinates)
+.setPopup(new mapboxgl.Popup({ offset: 25 }) // add popups
+.setHTML('<h3>' + post.title + '</h3><p>' + post.location + '</p>'))
+.addTo(map);
 
-  // create a HTML element for each feature
-  var el = document.createElement('div');
-  el.className = 'marker';
-
-  // make a marker for each feature and add to the map
-  new mapboxgl.Marker(el)
-  .setLngLat(marker.geometry.coordinates)
-  .setPopup(new mapboxgl.Popup({ offset: 25 }) // add popups
-  .setHTML('<h3>' + marker.properties.title + '</h3><p>' + marker.properties.description + '</p>'))
-  .addTo(map);
-});
 
 </script>
