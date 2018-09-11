@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+	<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.47.0/mapbox-gl.js'></script>
+	<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.47.0/mapbox-gl.css' rel='stylesheet' />
+	<link rel="stylesheet" href="/stylesheets/post-show.css">
+</head>
+<body>
+	<%- body -%>
+	<script>
+		var post = <%- JSON.stringify(post) %>;
+	</script>
+	<script src="/javascripts/post-show.js"></script>
+</body>
+</html>
