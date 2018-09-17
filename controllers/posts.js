@@ -12,7 +12,7 @@ module.exports = {
 	// Posts Index
 	async postIndex(req, res, next) {
 		let posts = await Post.find({});
-		res.render('posts/index', { posts });
+		res.render('posts/index', { posts, title: 'Posts Index' });
 	},
 	// Posts New
 	postNew(req, res, next) {
