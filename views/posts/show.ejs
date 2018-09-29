@@ -19,3 +19,29 @@
 		<input type="submit" value="Delete">
 	</form>
 </div>
+
+
+<h2>Create a Review</h2>
+<form action="/posts/<%= post.id %>/reviews" method="POST">
+	<textarea name="review[body]" required></textarea>
+	<input type="number" name="review[rating]" min="1" max="5" step="1" required>
+
+	<input type="submit">
+</form>
+
+<h3>Reviews</h3>
+<!-- display all reviews -->
+<% post.reviews.forEach(function(review) { %>
+	<div>
+		<%= review.body %>
+		Rating: <%= review.rating %>
+	</div>
+<% }); %>
+
+
+
+
+
+
+
+
