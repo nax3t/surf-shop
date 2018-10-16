@@ -49,7 +49,9 @@ module.exports = {
 				model: 'User'
 			}
 		});
-		res.render('posts/show', { post });
+		// the following line is not covered in a lecture
+		let mapBoxToken = process.env.MAPBOX_TOKEN;
+		res.render('posts/show', { post, mapBoxToken });
 	},
 	// Posts Edit
 	async postEdit(req, res, next) {

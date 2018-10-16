@@ -1,4 +1,4 @@
-mapboxgl.accessToken = 'your-token-here';
+mapboxgl.accessToken = mapBoxToken;
 
 var map = new mapboxgl.Map({
   container: 'map',
