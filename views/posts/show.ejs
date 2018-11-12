@@ -26,6 +26,7 @@
 	<textarea name="review[body]" required></textarea>
 	<fieldset class="starability-basic">
 	  <legend>Rating:</legend>
+	  <button class="clear-rating" type="button">Clear Rating</button>
 	  <input type="radio" id="rate0" class="input-no-rate" name="review[rating]" value="0" checked aria-label="No rating." />
 	  <input type="radio" id="rate1" name="review[rating]" value="1" />
 	  <label for="rate1" title="Terrible">1 star</label>
@@ -58,6 +59,7 @@
 			<textarea name="review[body]" required><%= review.body %></textarea>
 			<fieldset class="starability-basic">
 			  <legend>Rating:</legend>
+			  <button class="clear-rating" type="button">Clear Rating</button>
 			  <input type="radio" id="edit-rate0" class="input-no-rate" name="review[rating]" value="0" checked aria-label="No rating." />
 			  <input type="radio" id="edit-rate1" name="review[rating]" value="1" />
 			  <label for="edit-rate1" title="Terrible">1 star</label>
