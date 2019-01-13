@@ -1,5 +1,24 @@
+<style>
+	ul {
+		list-style-type: none;
+		margin: 0;
+		padding: 0;
+	}
+	li {
+		display: inline;
+		padding: 5px;
+	}
+</style>
+
 <ul>
 	<li><a href="/">Home</a></li>
 	<li><a href="/posts">Posts</a></li>
+	<% if(!currentUser) { %>
+	<li><a href="/register">Register</a></li>
+	<li><a href="/login">Login</a></li>
+	<% } else { %>
 	<li><a href="/posts/new">New Post</a></li>
+	<li><a href="/logout">Logout</a></li>
+	Welcome, <%= currentUser.username %>!
+	<% } %>
 </ul>

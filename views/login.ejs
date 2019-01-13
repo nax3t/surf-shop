@@ -1,0 +1,14 @@
+<% layout('layouts/boilerplate') -%>
+
+<form action="/login" method="POST">
+	<div>
+		<label for="username">Username:</label>
+		<input type="text" id="username" name="username" placeholder="username" required>
+	</div>
+	<div>
+		<label for="password">Password:</label>
+		<input type="password" id="password" name="password" placeholder="password" required>
+	</div>
+
+	<input type="submit">
+</form>
