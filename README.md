@@ -1,211 +1,198 @@
-# Continue User Authentication and Authorization Pt2.
+# Continue User Authentication and Authorization Pt3.
 
-## Remove checkIfUserExists middleware
-- Remove checkIfUserExists method (/middleware/index.js)
+## Re-seed the database
 
-```JS
-,
-	checkIfUserExists: async (req, res, next) => {
-		let userExists = await User.findOne({'email': req.body.email});
-		if(userExists) {
-			req.session.error = 'A user with the given email is already registered';
-			return res.redirect('back');
-		}
-		next();
-	}
-```
-- Remove checkIfUserExists (/routes/index.js)
+### File: /seeds.js
 
 Change:
 ```JS
-const { asyncErrorHandler, checkIfUserExists } = require('../middleware');
-```
-back to:
-```JS
-const { asyncErrorHandler } = require('../middleware');
-```
-
-Change:
-```JS
-/* POST /register */
-router.post('/register',
-	asyncErrorHandler(checkIfUserExists),
-	asyncErrorHandler(postRegister)
-);
-```
-back to:
-```JS
-/* POST /register */
-router.post('/register', asyncErrorHandler(postRegister));
-```
-
-## Add Authorization Middleware
-- Create isLoggedIn check (/middleware/index.js)
-
-(Add it in after the existing middleware methods and don't forget the comma after the method before it)
-```JS
-,
-	isLoggedIn: (req, res, next) => {
-		if(req.isAuthenticated()) return next();
-		req.session.error = 'You need to be logged in to do that!';
-		req.session.redirectTo = req.originalUrl;
-		res.redirect('/login');
-	}
-```
-- Bring middleware into post routes (/routes/posts.js)
-
-Change:
-```JS
-const { asyncErrorHandler } = require('../middleware');
+      author: {
+  '_id' : '5bb27cd1f986d278582aa58c',
+  'username' : 'ian'
+}
 ```
 to:
+```JS
+author: '5bb27cd1f986d278582aa58c'
+```
+*\*your id and username will be different*
+### File: /app.js
+
+Uncomment:
+```JS
+// const seedPosts = require('./seeds');
+// seedPosts();
+```
+in app.js, run the app one time to re-seed the database, then comment it back out.
+
+## Create isAuthor middleware
+
+### File: /middleware/index.js
+
+Add: 
+```JS
+const Post = require('../models/post');
+```
+to the top of the file, along with the other existing Review and User model
+
+Add the following middleware after the existing isLoggedIn middleware:
+```JS
+,
+	isAuthor: async (req, res, next) => {
+		let post = await Post.findById(req.params.id);
+		console.log(post);
+		if (post.author.equals(req.user._id)) {
+			res.locals.post = post;
+			return next();
+		}
+		req.session.error = 'Access denied!';
+		res.redirect('back');
+	}
+```
+
+### File: /controllers/posts.js
+
+Inside of the postCreate method, right after:
+```JS
+req.body.post.geometry = response.body.features[0].geometry;
+```
+add the following: 
+```JS
+req.body.post.author = req.user._id;
+```
+
+Change:
+```JS
+async postEdit(req, res, next) {
+  let post = await Post.findById(req.params.id);
+  res.render('posts/edit', { post });
+},
+```
+to:
+```JS
+postEdit(req, res, next) {
+	res.render('posts/edit');
+},
+```
+
+Change:
+```JS
+async postUpdate(req, res, next) {
+  // find the post by id
+  let post = await Post.findById(req.params.id);
+```
+to:
+```JS
+async postUpdate(req, res, next) {
+	// pull post from res.locals
+	const { post } = res.locals;
+```
+
+Change:
+```JS
+async postDestroy(req, res, next) {
+  let post = await Post.findById(req.params.id);
+```
+to:
+```JS
+async postDestroy(req, res, next) {
+	// pull post from res.locals
+	const { post } = res.locals;
+```
+
+## Add isAuthor middleware to post routes
+
+### File: /routes/posts.js
+
+Change:
 ```JS
 const { asyncErrorHandler, isLoggedIn } = require('../middleware');
 ```
+to:
+```JS
+const { asyncErrorHandler, isLoggedIn, isAuthor } = require('../middleware');
+```
+
 Change:
 ```JS
-/* GET posts new /posts/new */
-router.get('/new', postNew);
-
-/* POST posts create /posts */
-router.post('/', upload.array('images', 4), asyncErrorHandler(postCreate));
+router.get('/:id/edit', asyncErrorHandler(postEdit));
 ```
 to:
 ```JS
-/* GET posts new /posts/new */
-router.get('/new', isLoggedIn, postNew);
-
-/* POST posts create /posts */
-router.post('/', isLoggedIn, upload.array('images', 4), asyncErrorHandler(postCreate));
+router.get('/:id/edit', isLoggedIn, asyncErrorHandler(isAuthor), postEdit);
 ```
-
-### Update Register and Login Methods
-- Update postRegister method (/controllers/index.js)
 
 Change:
 ```JS
-// GET /register
-getRegister(req, res, next) {
-	res.render('register', { title: 'Register' });
+router.put('/:id', upload.array('images', 4), asyncErrorHandler(postUpdate));
+```
+to:
+```JS
+router.put('/:id', isLoggedIn, asyncErrorHandler(isAuthor), upload.array('images', 4), asyncErrorHandler(postUpdate));
+```
+
+Change:
+```JS
+router.delete('/:id', asyncErrorHandler(postDestroy));
+```
+to:
+```JS
+router.delete('/:id', isLoggedIn, asyncErrorHandler(isAuthor), asyncErrorHandler(postDestroy));
+```
+
+## Update GET '/login' route's getLogin method so that logged in users are redirected to the home page
+
+### File: /controllers/index.js
+
+Change:
+```JS
+getLogin(req, res, next) {
+  res.render('login', { title: 'Login' });
 },
 ```
 to:
 ```JS
-// GET /register
-getRegister(req, res, next) {
-	res.render('register', { title: 'Register', username: '', email: '' });
+getLogin(req, res, next) {
+  if (req.isAuthenticated()) return res.redirect('/');
+  res.render('login', { title: 'Login' });
 },
 ```
 
-Change:
-```JS
-// POST /register
-async postRegister(req, res, next) {
-	const newUser = new User({
-		username: req.body.username,
-		email: req.body.email,
-		image: req.body.image
-	});
+## Hide edit and delete buttons from users who are not author of post
 
-	let user = await User.register(newUser, req.body.password);
-	req.login(user, function(err) {
-		if (err) return next(err);
-		req.session.success = `Welcome to Surf Shop, ${user.username}!`;
-		res.redirect('/');
-	});
-},
-```
-to:
-```JS
-// POST /register
-async postRegister(req, res, next) {
-	try {
-		const user = await User.register(new User(req.body), req.body.password);
-		req.login(user, function(err) {
-			if (err) return next(err);
-			req.session.success = `Welcome to Surf Shop, ${user.username}!`;
-			res.redirect('/');
-		});
-	} catch(err) {
-		const { username, email } = req.body;
-		let error = err.message;
-		if (error.includes('duplicate') && error.includes('index: email_1 dup key')) {
-			error = 'A user with the given email is already registered';
-		}
-		res.render('register', { title: 'Register', username, email, error })
-	}
-},
-```
-- Update postLogin method (/controllers/index.js)
+### File: /views/posts/show.ejs
 
 Change:
-```JS
-// POST /login
-postLogin(req, res, next) {
-	passport.authenticate('local', {
-	  successRedirect: '/',
-	  failureRedirect: '/login' 
-	})(req, res, next);
-},
+```HTML
+<div>
+	<a href="/posts/<%= post.id %>/edit">
+		<button>Edit</button>
+	</a>
+</div>
+<div>
+	<form action="/posts/<%= post.id %>?_method=DELETE" method="POST">
+		<input type="submit" value="Delete">
+	</form>
+</div>
 ```
 to:
-```JS
-// POST /login
-async postLogin(req, res, next) {
-	const { username, password } = req.body;
-	const { user, error } = await User.authenticate()(username, password);
-	if(!user && error) {
-		return next(error);
-	}
-	req.login(user, function(err) {
-		if (err) return next(err);
-		req.session.success = `Welcome back, ${username}!`;
-		const redirectUrl = req.session.redirectTo || '/';
-		delete req.session.redirectTo;
-		res.redirect(redirectUrl);
-	});
-},
+```HTML
+<% if (currentUser && post.author.equals(currentUser._id)) { %>
+<div>
+	<a href="/posts/<%= post.id %>/edit">
+		<button>Edit</button>
+	</a>
+</div>
+<div>
+	<form action="/posts/<%= post.id %>?_method=DELETE" method="POST">
+		<input type="submit" value="Delete">
+	</form>
+</div>
+<% } %>
 ```
 
-### Update Index (auth) Routes
+## Testing it all out
 
-- Update login POST route (/routes/index.js)
-
-Change:
-```JS
-/* POST /login */
-router.post('/login', postLogin);
-```
-to:
-```JS
-/* POST /login */
-router.post('/login', asyncErrorHandler(postLogin));
-```
-
-### Update Register View
-- Update the username and email inputs (/views/register.ejs)
-
-Change:
-```JS
-<input type="text" id="username" name="username" placeholder="username" required>
-```
-to:
-```JS
-<input type="text" id="username" name="username" placeholder="username" value="<%= username %>" required>
-```
-
-Change:
-```JS
-<input type="email" id="email" name="email" placeholder="email" required>
-```
-to:
-```JS
-<input type="email" id="email" name="email" placeholder="email" value="<%= email %>" required>
-```
-
-### Fix Not Found Error with Favicon
-- Add a favicon.ico file to the /public directory (download from [here](https://cdn.discordapp.com/attachments/466639921201938446/530956610760343563/favicon.ico))
-- Uncomment the following line in /app.js (and remove the comment before it, if you like)
-```JS
-app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-```
+- Log in and create a new post then ensure that you can edit and delete it
+- Try to visit edit route for an existing post that you did not create (while logged out and while logged in)
+- Try to send delete request a post that you didn't create with curl e.g., `curl -X "DELETE" http://localhost:3000/posts/5c48b91de3c8f61bed99cb76` then check on the post to see if it was deleted
