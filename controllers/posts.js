@@ -60,7 +60,7 @@ module.exports = {
 		res.render('posts/show', { post, mapBoxToken, floorRating });
 	},
 	// Posts Edit
-	async postEdit(req, res, next) {
+	postEdit(req, res, next) {
 		res.render('posts/edit');
 	},
 	// Posts Update

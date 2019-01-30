@@ -1,73 +1,64 @@
-# Continue User Authentication and Authorization Pt3.
+# Housekeeping - Bug Fixes and Updates
 
-## Re-seed the database
+## Update npm
 
-### File: /seeds.js
+Run `npm install npm@latest -g` in the terminal
+
+## Update npm packages
+- Run `npm install -g npm-check-updates` in the terminal, from root folder of project
+- Now run `ncu --upgradeAll ` (same terminal window)
+- Finally, run `npm update` (same terminal window)
+
+## Update mongoose.connect()
+
+### File: /app.js
 
 Change:
 ```JS
-      author: {
-  '_id' : '5bb27cd1f986d278582aa58c',
-  'username' : 'ian'
-}
+mongoose.connect('mongodb://localhost:27017/surf-shop', { useNewUrlParser: true });
 ```
 to:
 ```JS
-author: '5bb27cd1f986d278582aa58c'
+mongoose.connect('mongodb://localhost:27017/surf-shop', {
+	useNewUrlParser: true,
+	useCreateIndex: true
+});
 ```
-*\*your id and username will be different*
+
+## Remove body-parser
+
 ### File: /app.js
 
-Uncomment:
+Run `npm uninstall body-parser` in the terminal, from root folder of project
+
+Remove:
 ```JS
-// const seedPosts = require('./seeds');
-// seedPosts();
+const bodyParser = require('body-parser');
 ```
-in app.js, run the app one time to re-seed the database, then comment it back out.
 
-## Create isAuthor middleware
-
-### File: /middleware/index.js
-
-Add: 
+Change:
 ```JS
-const Post = require('../models/post');
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 ```
-to the top of the file, along with the other existing Review and User model
 
-Add the following middleware after the existing isLoggedIn middleware:
+to:
 ```JS
-,
-	isAuthor: async (req, res, next) => {
-		let post = await Post.findById(req.params.id);
-		console.log(post);
-		if (post.author.equals(req.user._id)) {
-			res.locals.post = post;
-			return next();
-		}
-		req.session.error = 'Access denied!';
-		res.redirect('back');
-	}
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 ```
+
+## Remove async from postEdit method
 
 ### File: /controllers/posts.js
-
-Inside of the postCreate method, right after:
-```JS
-req.body.post.geometry = response.body.features[0].geometry;
-```
-add the following: 
-```JS
-req.body.post.author = req.user._id;
-```
 
 Change:
 ```JS
 async postEdit(req, res, next) {
-  let post = await Post.findById(req.params.id);
-  res.render('posts/edit', { post });
+	res.render('posts/edit');
 },
 ```
+
 to:
 ```JS
 postEdit(req, res, next) {
@@ -75,124 +66,38 @@ postEdit(req, res, next) {
 },
 ```
 
-Change:
-```JS
-async postUpdate(req, res, next) {
-  // find the post by id
-  let post = await Post.findById(req.params.id);
-```
-to:
-```JS
-async postUpdate(req, res, next) {
-	// pull post from res.locals
-	const { post } = res.locals;
-```
-
-Change:
-```JS
-async postDestroy(req, res, next) {
-  let post = await Post.findById(req.params.id);
-```
-to:
-```JS
-async postDestroy(req, res, next) {
-	// pull post from res.locals
-	const { post } = res.locals;
-```
-
-## Add isAuthor middleware to post routes
-
 ### File: /routes/posts.js
 
 Change:
 ```JS
-const { asyncErrorHandler, isLoggedIn } = require('../middleware');
-```
-to:
-```JS
-const { asyncErrorHandler, isLoggedIn, isAuthor } = require('../middleware');
-```
-
-Change:
-```JS
-router.get('/:id/edit', asyncErrorHandler(postEdit));
+router.get('/:id/edit', isLoggedIn, asyncErrorHandler(isAuthor), asyncErrorHandler(postEdit));
 ```
 to:
 ```JS
 router.get('/:id/edit', isLoggedIn, asyncErrorHandler(isAuthor), postEdit);
 ```
 
-Change:
-```JS
-router.put('/:id', upload.array('images', 4), asyncErrorHandler(postUpdate));
-```
-to:
-```JS
-router.put('/:id', isLoggedIn, asyncErrorHandler(isAuthor), upload.array('images', 4), asyncErrorHandler(postUpdate));
-```
+## Change price input to number type
 
-Change:
-```JS
-router.delete('/:id', asyncErrorHandler(postDestroy));
-```
-to:
-```JS
-router.delete('/:id', isLoggedIn, asyncErrorHandler(isAuthor), asyncErrorHandler(postDestroy));
-```
-
-## Update GET '/login' route's getLogin method so that logged in users are redirected to the home page
-
-### File: /controllers/index.js
-
-Change:
-```JS
-getLogin(req, res, next) {
-  res.render('login', { title: 'Login' });
-},
-```
-to:
-```JS
-getLogin(req, res, next) {
-  if (req.isAuthenticated()) return res.redirect('/');
-  res.render('login', { title: 'Login' });
-},
-```
-
-## Hide edit and delete buttons from users who are not author of post
-
-### File: /views/posts/show.ejs
+### File: /views/posts/new.ejs
 
 Change:
 ```HTML
-<div>
-	<a href="/posts/<%= post.id %>/edit">
-		<button>Edit</button>
-	</a>
-</div>
-<div>
-	<form action="/posts/<%= post.id %>?_method=DELETE" method="POST">
-		<input type="submit" value="Delete">
-	</form>
-</div>
+<input type="text" name="post[price]" placeholder="Price">
 ```
 to:
 ```HTML
-<% if (currentUser && post.author.equals(currentUser._id)) { %>
-<div>
-	<a href="/posts/<%= post.id %>/edit">
-		<button>Edit</button>
-	</a>
-</div>
-<div>
-	<form action="/posts/<%= post.id %>?_method=DELETE" method="POST">
-		<input type="submit" value="Delete">
-	</form>
-</div>
-<% } %>
+<input type="number" name="post[price]" placeholder="Price">
 ```
 
-## Testing it all out
+### File: /views/posts/edit.ejs
 
-- Log in and create a new post then ensure that you can edit and delete it
-- Try to visit edit route for an existing post that you did not create (while logged out and while logged in)
-- Try to send delete request a post that you didn't create with curl e.g., `curl -X "DELETE" http://localhost:3000/posts/5c48b91de3c8f61bed99cb76` then check on the post to see if it was deleted
+Change:
+```HTML
+<input type="text" name="post[price]" placeholder="Price" value="<%= post.price  %>">
+```
+to:
+```HTML
+<input type="number" name="post[price]" placeholder="Price" value="<%= post.price  %>">
+```
+

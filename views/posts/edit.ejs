@@ -3,7 +3,7 @@
 
 <form action="/posts/<%= post.id %>?_method=PUT" method="POST" id="postEditForm" enctype="multipart/form-data">
 	<div><input type="text" name="post[title]" placeholder="Title" value="<%= post.title  %>"></div>
-	<div><input type="text" name="post[price]" placeholder="Price" value="<%= post.price  %>"></div>
+	<div><input type="number" name="post[price]" placeholder="Price" value="<%= post.price  %>"></div>
 	<div>
 		<input type="file" id="imageUpload" accept="images/*" name="images" multiple />
 		<div>
