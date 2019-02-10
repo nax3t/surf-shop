@@ -3,7 +3,7 @@
 
 <form action="/posts" method="POST" enctype="multipart/form-data">
 	<div><input type="text" name="post[title]" placeholder="Title"></div>
-	<div><input type="number" name="post[price]" placeholder="Price"></div>
+	<div><input type="number" name="post[price]" step=".01" placeholder="Price"></div>
 	<div>
 		<input type="file" accept="images/*" name="images" multiple />
 	</div>
