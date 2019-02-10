@@ -1,123 +1,103 @@
-# Housekeeping - Bug Fixes and Updates Pt. 2
+# User Profile Pt. 1
 
-## Update number inputs (again, "D'oh!")
+## Create profile view
 
-### File: /views/posts/new.ejs
+### Inside of `/views` create a new file named `profile.ejs`
 
-Change:
+Add the following code to the profile.ejs view:
 ```HTML
-<div><input type="number" name="post[price]" placeholder="Price"></div>
-```
-to:
-```HTML
-<div><input type="number" name="post[price]" step=".01" placeholder="Price"></div>
-```
+<% layout('layouts/boilerplate') -%>
 
-### File: /views/posts/edit.ejs
+<h1><%= user.username %>'s Profile</h1>
 
+<p>Recent posts:</p>
 
-Change:
-```HTML
-<div><input type="number" name="post[price]" placeholder="Price" value="<%= post.price  %>"></div>
-```
-to:
-```HTML
-<div><input type="number" name="post[price]" step=".01" placeholder="Price" value="<%= post.price  %>"></div>
+<% posts.forEach(function(post) { %>
+<div>
+	<a href="/posts/<%= post.id %>"><%= post.title %></a>
+</div>
+<% }); %>
 ```
 
-## Update postUpdate method
+## Update index routes with getProfile method
 
-### File: /controllers/posts.js
+### File: /routes/index.js
 
 Change:
 ```JS
-post.save();
+const { 
+	landingPage,
+	getRegister,
+	postRegister,
+	getLogin,
+	postLogin,
+	getLogout } = require('../controllers');
 ```
 to:
 ```JS
-await post.save();
+const { 
+	landingPage,
+	getRegister,
+	postRegister,
+	getLogin,
+	postLogin,
+	getLogout,
+	getProfile
+} = require('../controllers');
 ```
-
-## Toggle Review Form
-
-### File: /views/posts/show.ejs
-
-Change:
-```HTML
-<h2>Create a Review</h2>
-<form action="/posts/<%= post.id %>/reviews" method="POST">
-	<textarea name="review[body]" required></textarea>
-	<fieldset class="starability-basic">
-	  <legend>Rating:</legend>
-	  <button class="clear-rating" type="button">Clear Rating</button>
-	  <input type="radio" id="rate0" class="input-no-rate" name="review[rating]" value="0" checked aria-label="No rating." />
-	  <input type="radio" id="rate1" name="review[rating]" value="1" />
-	  <label for="rate1" title="Terrible">1 star</label>
-	  <input type="radio" id="rate2" name="review[rating]" value="2" />
-	  <label for="rate2" title="Not good">2 stars</label>
-	  <input type="radio" id="rate3" name="review[rating]" value="3" />
-	  <label for="rate3" title="Average">3 stars</label>
-	  <input type="radio" id="rate4" name="review[rating]" value="4" />
-	  <label for="rate4" title="Very good">4 stars</label>
-	  <input type="radio" id="rate5" name="review[rating]" value="5" />
-	  <label for="rate5" title="Amazing">5 stars</label>
-	</fieldset>
-
-	<input type="submit">
-</form>
-```
-to:
-```HTML
-<% if(currentUser) { %>
-<h2>Create a Review</h2>
-<form action="/posts/<%= post.id %>/reviews" method="POST">
-	<textarea name="review[body]" required></textarea>
-	<fieldset class="starability-basic">
-	  <legend>Rating:</legend>
-	  <button class="clear-rating" type="button">Clear Rating</button>
-	  <input type="radio" id="rate0" class="input-no-rate" name="review[rating]" value="0" checked aria-label="No rating." />
-	  <input type="radio" id="rate1" name="review[rating]" value="1" />
-	  <label for="rate1" title="Terrible">1 star</label>
-	  <input type="radio" id="rate2" name="review[rating]" value="2" />
-	  <label for="rate2" title="Not good">2 stars</label>
-	  <input type="radio" id="rate3" name="review[rating]" value="3" />
-	  <label for="rate3" title="Average">3 stars</label>
-	  <input type="radio" id="rate4" name="review[rating]" value="4" />
-	  <label for="rate4" title="Very good">4 stars</label>
-	  <input type="radio" id="rate5" name="review[rating]" value="5" />
-	  <label for="rate5" title="Amazing">5 stars</label>
-	</fieldset>
-
-	<input type="submit">
-</form>
-<% } else { %>
-<h2><a href="/login?returnTo=true">Create a Review</a></h2>
-<% } %>
-```
-
-Change:
-```HTML
-<% if(review.author.equals(currentUser._id)) { %>
-```
-to:
-```HTML
-<% if(currentUser && review.author.equals(currentUser._id)) { %>
-```
-
-### File: /controllers/index.js
 
 Change:
 ```JS
-getLogin(req, res, next) {
-	if (req.isAuthenticated()) return res.redirect('/');
-	res.render('login', { title: 'Login' });
+const { asyncErrorHandler } = require('../middleware')
+```
+to:
+```JS
+const { asyncErrorHandler, isLoggedIn } = require('../middleware');
+```
+
+Change:
+```JS
+router.get('/profile', (req, res, next) => {
+  res.send('GET /profile');
+});
+```
+to:
+```JS
+router.get('/profile', isLoggedIn, asyncErrorHandler(getProfile));
+```
+
+## Add getProfile method to index controller
+
+### File: /controlers/index.js
+
+Add:
+```JS
+,
+// GET /profile
+async getProfile(req, res, next) {
+	const { user } = req;
+	const posts = await Post.find().where('author').equals(user.id).exec();
+	res.render('profile', { user, posts });
+}
+```
+after:
+```JS
+getLogout(req, res, next) {
+  req.logout();
+  res.redirect('/');
+}
+```
+final result:
+```JS
+// GET /logout
+getLogout(req, res, next) {
+  req.logout();
+  res.redirect('/');
 },
-```
-to:
-```JS
-getLogin(req, res, next) {
-	if (req.isAuthenticated()) return res.redirect('/');
-	if (req.query.returnTo) req.session.redirectTo = req.headers.referer;
-	res.render('login', { title: 'Login' });
-},
+// GET /profile
+async getProfile(req, res, next) {
+	const { user } = req;
+	const posts = await Post.find().where('author').equals(user.id).exec();
+	res.render('profile', { user, posts });
+}
 ```
