@@ -1,359 +1,250 @@
-# Profile Image
+# Forgot Password / Reset
 
-**Problem:**
-1. Multer and body-parser have to be in a specific order to work properly together. Multer (image upload) wants to be first in line, otherwise we end up with an empty req.body object.
+## Important note, please read:
+I'm using a new format for some of the code snippets. It will resemble what you see when using a `git diff` command.
 
-**Scenarios:**
-1. A user tries to sign up, but encounters an error somewhere in the process, the already uploaded image needs to be deleted
-2. A user signs up successfully, but then tries to update their profile and encounters an error. The already uploaded image must be deleted here, as well.
-3. User signs up without issue and/or user updates profile without issue.
+For example,
+```JS
+const leaveMeAlone = require('leave-me-alone');
+-const removeMe = require('remove-me');
++const addMe = require('add-me');
+```
+The above example means you should find the first line in your code, then remove the line with the minus - sign before it and add the line with the plus + sign before it.
 
-**Solution:**
-1. Create a middleware that checks if an image is uploaded and deletes it if there is one. Run this middleware any time we encounter an error in the register/update profile process.
+If you have any questions about this new format, please ask them in the [course Discord server](https://discord.gg/QH4qbW7)
 
-## Update user model
+## Sign up for SendGrid
 
-### File: /models/user.js
+- Visit: [https://signup.sendgrid.com/](https://signup.sendgrid.com/) and create a free Trial 40k account
+- Verify your account by email
+- Copy your API key and add it to your .env file as SENDGRID_API_KEY
+
+## Install the @sendgrid/mail and crypto npm packages
+
+- `npm i @sendgrid/mail crypto` 
+	- *(check to be sure you are using npm version 5 or newer, otherwise include the -S flag e.g., `npm i -S @sendgrid/mail crypto`)*
+
+## Models
+
+### Update /models/user.js
 
 Change:
 ```JS
-image: String
-```
-to:
-```JS
-image: {
-	secure_url: { type: String, default: '/images/default-profile.jpg' },
-	public_id: String
-}
-```
-
-## Add default profile image to static images
-
-### File: /public/images/default-profile.jpg
-
-Download [this file](https://res.cloudinary.com/devsprout/image/upload/v1551403751/default-profile.jpg) and put it inside of `/public/images`
-
-## Update register.ejs view
-
-### File: /views/register.ejs
-
-Change:
-```HTML
-<form action="/register" method="POST">
-```
-to:
-```HTML
-<form action="/register" method="POST" enctype="multipart/form-data">
-```
-
-## Update profile.ejs view
-
-### File: /views/profile.ejs
-
-Change:
-```HTML
-<h1><%= currentUser.username %>'s Profile</h1>
-```
-to:
-```HTML
-<h1><img src="<%= currentUser.image.secure_url %>" alt="<%= currentUser.username %>'s profile image" class="profile-image"> <%= currentUser.username %>'s Profile</h1>
-```
----
-Change:
-```HTML
-<form action="/profile?_method=PUT" method="POST">
-```
-to:
-```HTML
-<form action="/profile?_method=PUT" method="POST" enctype="multipart/form-data">
-```
----
-Add:
-```HTML
-<small>(this deletes existing)</small>
-```
-After:
-```HTML
-<label for="image">Image:</label>
-```
-
-## Update main stylesheet
-
-### /public/stylsheets/style.css
-
-Add the following code to the bottom of the file:
-```CSS
-.profile-image {
-	width: 100px;
-	border-radius: 50%;
-}
-```
-
-## Update middleware
-
-### File: /middleware/index.js
-
-Add:
-```JS
-const { cloudinary } = require('../cloudinary');
-```
-After:
-```JS
-const Post = require('../models/post');
-```
----
-Change:
-```JS
-module.exports = {
-```
-to:
-```JS
-const middleware = {
-```
----
-Add the following code to the bottom of the file:
-```JS
-module.exports = middleware;
-```
----
-Change:
-```JS
-isValidPassword: async (req, res, next) => {
-	const { user } = await User.authenticate()(req.user.username, req.body.currentPassword);
-	if (user) {
-		// add user to res.locals
-		res.locals.user = user;
-		next();
-	} else {
-		req.session.error = 'Incorrect current password!';
-		return res.redirect('/profile');
+const UserSchema = new Schema({
+	email: { type: String, unique: true, required: true },
+	image:  {
+		secure_url: { type: String, default: '/images/default-profile.jpg' },
+		public_id: String
 	}
-},
-changePassword: async (req, res, next) => {
-	const {
-		newPassword,
-		passwordConfirmation
-	} = req.body;
-
-	if (newPassword && !passwordConfirmation) {
-		req.session.error = 'Missing password confirmation!';
-		return res.redirect('/profile');
-	} else if (newPassword && passwordConfirmation) {
-		const { user } = res.locals;
-		if (newPassword === passwordConfirmation) {
-			await user.setPassword(newPassword);
-			next();
-		} else {
-			req.session.error = 'New passwords must match!';
-			return res.redirect('/profile');
-		}
-	} else {
-		next();
-	}
-}
+});
 ```
 to:
 ```JS
-isValidPassword: async (req, res, next) => {
-	const { user } = await User.authenticate()(req.user.username, req.body.currentPassword);
-	if (user) {
-		// add user to res.locals
-		res.locals.user = user;
-		next();
-	} else {
-		middleware.deleteProfileImage(req);
-		req.session.error = 'Incorrect current password!';
-		return res.redirect('/profile');
-	}
-},
-changePassword: async (req, res, next) => {
-	const {
-		newPassword,
-		passwordConfirmation
-	} = req.body;
-
-	if (newPassword && !passwordConfirmation) {
-		middleware.deleteProfileImage(req);
-		req.session.error = 'Missing password confirmation!';
-		return res.redirect('/profile');
-	} else if (newPassword && passwordConfirmation) {
-		const { user } = res.locals;
-		if (newPassword === passwordConfirmation) {
-			await user.setPassword(newPassword);
-			next();
-		} else {
-			middleware.deleteProfileImage(req);
-			req.session.error = 'New passwords must match!';
-			return res.redirect('/profile');
-		}
-	} else {
-		next();
-	}
-},
-deleteProfileImage: async (req) => {
-	if (req.file) await cloudinary.v2.uploader.destroy(req.file.public_id);
-}
+const UserSchema = new Schema({
+	email: { type: String, unique: true, required: true },
+	image:  {
+		secure_url: { type: String, default: '/images/default-profile.jpg' },
+		public_id: String
+	},
+	resetPasswordToken: String,
+	resetPasswordExpires: Date
+});
 ```
 
-## Update index controller
+## Views
+
+Create a new folder inside of `/views` named `/users`
+
+Create two new view files inside of `/views/users` and name them `forgot.ejs` and `reset.ejs`
+
+### File: /views/users/forgot.ejs
+
+Add the following markup:
+```HTML
+<% layout('layouts/boilerplate') -%>
+
+<h1>Forgot Password</h1>
+
+<form action="/forgot-password?_method=PUT" method="POST">
+	<div>
+		<label for="email">Email</label>
+		<input type="email" id="email" name="email" autofocus>
+	</div>
+	<div>
+		<input type="submit" value="Reset Password">
+	</div>
+</form>
+```
+
+### File: /views/users/reset.ejs
+
+Add the following markup:
+```HTML
+<% layout('layouts/boilerplate') -%>
+
+<h1>Reset Password</h1>
+
+<form action="/reset/<%= token %>?_method=PUT" method="POST">
+  <div>
+    <label for="password">New Password</label>
+    <input type="password" name="password" id="password" placeholder="New password" autofocus>
+  </div>
+  <div>
+    <label for="confirm">Confirm Password</label>
+    <input type="password" name="confirm" id="confirm" placeholder="Confirm password">
+  </div>
+  <div>
+    <input type="submit" value="Update Password">
+  </div>
+</form>
+```
+
+### File: /views/login.ejs
+
+Add the following markup to the bottom of the file, after the existing form element:
+```HTML
+<div>
+	<a href="/forgot-password">Forgot password?</a>
+</div>
+```
+
+
+## Controllers
 
 ### File: /controllers/index.js
 
-Add:
 ```JS
+const mapBoxToken = process.env.MAPBOX_TOKEN;
+const util = require('util');
 const { cloudinary } = require('../cloudinary');
 const { deleteProfileImage } = require('../middleware');
-```
-After:
-```JS
-const util = require('util');
-```
----
-Change:
-```JS
-// POST /register
-async postRegister(req, res, next) {
-	try {
-		const user = await User.register(new User(req.body), req.body.password);
-		req.login(user, function(err) {
-			if (err) return next(err);
-			req.session.success = `Welcome to Surf Shop, ${user.username}!`;
-			res.redirect('/');
-		});
-	} catch(err) {
-		const { username, email } = req.body;
-		let error = err.message;
-		if (error.includes('duplicate') && error.includes('index: email_1 dup key')) {
-			error = 'A user with the given email is already registered';
-		}
-		res.render('register', { title: 'Register', username, email, error });
-	}
-},
-```
-to:
-```JS
-// POST /register
-async postRegister(req, res, next) {
-	try {
-		if (req.file) {
-			const { secure_url, public_id } = req.file;
-			req.body.image = {
-				secure_url,
-				public_id
-			}
-		}
-		const user = await User.register(new User(req.body), req.body.password);
-		req.login(user, function(err) {
-			if (err) return next(err);
-			req.session.success = `Welcome to Surf Shop, ${user.username}!`;
-			res.redirect('/');
-		});
-	} catch(err) {
-		deleteProfileImage(req);
-		const { username, email } = req.body;
-		let error = err.message;
-		if (error.includes('duplicate') && error.includes('index: email_1 dup key')) {
-			error = 'A user with the given email is already registered';
-		}
-		res.render('register', { title: 'Register', username, email, error });
-	}
-},
++const crypto = require('crypto');
++const sgMail = require('@sendgrid/mail');
++sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 ```
 ---
-Change:
+Add the following after the updateProfile method *(don't forget comma after updateProfile closing bracket)*
 ```JS
-async updateProfile(req, res, next) {
-	const {
-		username,
-		email
-	} = req.body;
-	const { user } = res.locals;
-	if (username) user.username = username;
-	if (email) user.email = email;
-	await user.save();
-	const login = util.promisify(req.login.bind(req));
-	await login(user);
-	req.session.success = 'Profile successfully updated!';
-	res.redirect('/profile');
-}
-```
-to:
-```JS
-async updateProfile(req, res, next) {
-	const {
-		username,
-		email
-	} = req.body;
-	const { user } = res.locals;
-	if (username) user.username = username;
-	if (email) user.email = email;
-	if (req.file) {
-		if (user.image.public_id) await cloudinary.v2.uploader.destroy(user.image.public_id);
-		const { secure_url, public_id } = req.file;
-		user.image = { secure_url, public_id };
+getForgotPw(req, res, next) {
+	res.render('users/forgot');
+},
+async putForgotPw(req, res, next) {
+	const token = await crypto.randomBytes(20).toString('hex');
+	
+	const user = await User.findOne({ email: req.body.email })
+	if (!user) {
+		req.session.error = 'No account with that email address exists.';
+	  return res.redirect('/forgot-password');
 	}
-	await user.save();
-	const login = util.promisify(req.login.bind(req));
-	await login(user);
-	req.session.success = 'Profile successfully updated!';
-	res.redirect('/profile');
+
+	user.resetPasswordToken = token;
+	user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+
+  await user.save();
+  
+
+  const msg = {
+    to: user.email,
+    from: 'Surf Shop Admin <your@email.com>',
+    subject: 'Surf Shop - Forgot Password / Reset',
+    text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.
+			Please click on the following link, or copy and paste it into your browser to complete the process:
+			http://${req.headers.host}/reset/${token}
+			If you did not request this, please ignore this email and your password will remain unchanged.`.replace(/				/g, ''),
+  };
+
+  await sgMail.send(msg);
+
+  req.session.success = `An e-mail has been sent to ${user.email} with further instructions.`;
+  res.redirect('/forgot-password');
+},
+async getReset(req, res, next) {
+  const { token } = req.params;
+	const user = await User.findOne({ resetPasswordToken: token, resetPasswordExpires: { $gt: Date.now() } })
+  if (!user) {
+    req.session.error = 'Password reset token is invalid or has expired.';
+    return res.redirect('/forgot-password');
+  }
+  res.render('users/reset', { token });
+},
+async putReset(req, res, next) {
+	const { token } = req.params;
+	const user = await User.findOne({ resetPasswordToken: token, resetPasswordExpires: { $gt: Date.now() } });
+	
+	if (!user) {
+	 req.session.error = 'Password reset token is invalid or has expired.';
+	 return res.redirect(`/reset/${ token }`);
+	}
+
+	if(req.body.password === req.body.confirm) {
+		await user.setPassword(req.body.password);
+		user.resetPasswordToken = null;
+		user.resetPasswordExpires = null;
+		await user.save();
+		const login = util.promisify(req.login.bind(req));
+		await login(user);
+	} else {
+		req.session.error = 'Passwords do not match.';
+		return res.redirect(`/reset/${ token }`);
+	}
+
+  const msg = {
+    to: user.email,
+    from: 'Surf Shop Admin <your@email.com>',
+    subject: 'Surf Shop - Password Changed',
+    text: `Hello,
+	  	This email is to confirm that the password for your account has just been changed.
+	  	If you did not make this change, please hit reply and notify us at once.`.replace(/		  	/g, '')
+  };
+  
+  await sgMail.send(msg);
+
+  req.session.success = 'Password successfully updated!';
+  res.redirect('/');
 }
 ```
 
-## Update index routes
+## Routes
 
 ### File: /routes/index.js
 
-Add:
 ```JS
-const multer = require('multer');
-const { storage } = require('../cloudinary');
-const upload = multer({ storage });
-```
-After:
-```JS
-const router = express.Router();
+const {
+        postLogin,
+        getLogout,
+        getProfile,
+-       updateProfile
++       updateProfile,
++       getForgotPw,
++       putForgotPw,
++       getReset,
++       putReset
+ } = require('../controllers');
+
 ```
 ---
-Change:
 ```JS
-router.post('/register', asyncErrorHandler(postRegister));
-```
-to:
-```JS
-router.post('/register', upload.single('image'), asyncErrorHandler(postRegister));
-```
----
-Change:
-```JS
-/* PUT /profile */
-router.put('/profile',
-	isLoggedIn,
-	asyncErrorHandler(isValidPassword),
-	asyncErrorHandler(changePassword),
-	asyncErrorHandler(updateProfile)
-);
-```
-to:
-```JS
-/* PUT /profile */
-router.put('/profile',
-	isLoggedIn,
-	upload.single('image'),
-	asyncErrorHandler(isValidPassword),
-	asyncErrorHandler(changePassword),
-	asyncErrorHandler(updateProfile)
-);
-```
-## Small refactor
-
-### File: /routes/posts.js
-
-Change:
-```JS
-const { cloudinary, storage } = require('../cloudinary');
-```
-to:
-```JS
-const { storage } = require('../cloudinary');
+ /* GET /forgot */
+-router.get('/forgot', (req, res, next) => {
+-  res.send('GET /forgot');
+-});
++router.get('/forgot-password', getForgotPw);
+ 
+ /* PUT /forgot */
+-router.put('/forgot', (req, res, next) => {
+-  res.send('PUT /forgot');
+-});
++router.put('/forgot-password', asyncErrorHandler(putForgotPw));
+ 
+ /* GET /reset/:token */
+-router.get('/reset/:token', (req, res, next) => {
+-  res.send('GET /reset/:token');
+-});
++router.get('/reset/:token', asyncErrorHandler(getReset));
+ 
+ /* PUT /reset/:token */
+-router.put('/reset/:token', (req, res, next) => {
+-  res.send('PUT /reset/:token');
+-});
++router.put('/reset/:token', asyncErrorHandler(putReset));
 ```
