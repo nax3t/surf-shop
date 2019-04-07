@@ -1,13 +1,15 @@
 <div style="margin: 20px 0;">
 <% if(posts.page - 1) { %>
-	<a href="/posts?page=<%= posts.page - 1 %>">Prev</a>
+	<a href="/posts?page=<%= posts.page - 1 %><%= queryString %>">Prev</a>
 <% } %>
+<% if(posts.pages > 1 && posts.docs.length) { %>
 <% for(let i = 1; i <= posts.pages; i++) { %>
-	<a href="/posts?page=<%= i %>"
+	<a href="/posts?page=<%= i %><%= queryString %>"
 		 <%= i === posts.page ? 'style=color:#000;' : '' %>
 		><%= i %></a>
 <% } %>
+<% } %>
 <% if((posts.page + 1) <= posts.pages) { %>
-	<a href="/posts?page=<%= posts.page + 1 %>">Next</a>
+	<a href="/posts?page=<%= posts.page + 1 %><%= queryString %>">Next</a>
 <% } %>
 </div>
