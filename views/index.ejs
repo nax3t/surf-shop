@@ -1,10 +1,36 @@
 <% layout('layouts/boilerplate') -%>
-<h1><%= title %></h1>
-<p>Welcome to <%= title %></p>
 <div id="map"></div>
 
+<div class="blog-home2 spacer">
+  <div class="container">
+    <!-- Row  -->
+    <div class="row justify-content-center">
+      <!-- Column -->
+       <div class="col-md-8 text-center">
+        <h2 class="title">Recent Posts</h2>
+        <h6 class="subtitle">Check out our latest listings</h6>
+       </div>
+      <!-- Column -->
+    </div>
+    <div class="row m-t-40">
+      <% recentPosts.forEach(post => { %>
+      <!-- Column -->
+      <div class="col-md-4">
+        <div class="card" data-aos="flip-left" data-aos-duration="1200">
+          <a href="/posts/<%= post.id %>"><img class="card-img-top" src="<%= post.images[0].url %>" alt="wrappixel kit"></a>
+          <div class="date-pos bg-info-gradiant"><%= moment(post._id).format('MMM') %><span><%= moment(post._id).format('D') %></span></div>
+          <h5 class="font-medium my-3"><a href="/posts/<%= post.id %>" class="link"><%= post.title %></a></h5>
+          <p class="my-1"><%= post.location %></p>    
+          <a href="/posts/<%= post.id %>" class="linking text-themecolor my-1">Learn More <i class="ti-arrow-right"></i></a>
+        </div>
+      </div>
+      <% }); %>
+    </div>
+  </div>
+</div>
+
 <script>
-	mapboxgl.accessToken = "<%= mapBoxToken %>";
-	var posts = { features: <%- JSON.stringify(posts) %> };
+  mapboxgl.accessToken = "<%= mapBoxToken %>";
+  var posts = { features: <%- JSON.stringify(posts) %> };
 </script>
 <script src="/javascripts/allPostsClusterMap.js"></script>

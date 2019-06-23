@@ -1,0 +1,450 @@
+@import '../variable';
+
+/*******************
+topbar color
+*******************/
+.topbar.fixed-header {
+    background: $dark;
+}
+
+/*******************
+Static slide 10
+*******************/
+.static-slider-head{
+    min-height: 600px; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: auto;
+    background-size:cover;
+    background-position: center center;
+    .title{
+        color:$white;
+        font-weight: 700;
+        font-size: 70px;
+        line-height: 100px;
+    }
+    .subtitle{
+        color:$white;
+        line-height: 30px;
+    }
+}
+/*******************
+Header 1
+*******************/
+
+.h1-nav {
+    padding: 15px 0;
+    .navbar-nav .nav-item {
+        margin: 0 20px;
+        .nav-link {
+            padding: 12px 0px;
+            color: $muted;
+            font-weight: 400;
+            &:hover {
+                color: $success;
+            }
+        }
+        &:last-child {
+            margin-right: 0px;
+        }
+    }
+}
+/*******************
+Header 2
+*******************/
+
+.h2-nav {
+    padding: 15px 0;
+    .navbar-nav .nav-item {
+        margin: 0 20px;
+        .nav-link {
+            padding: 12px 0px;
+            color: $white;
+            font-weight: 400;
+            &:hover {
+                color: $info;
+            }
+        }
+        &:last-child {
+            margin-right: 0px;
+        }
+    }
+}
+
+/*******************
+Static slide 10
+*******************/
+.static-slider10 {
+    padding: 10% 0;
+    background-size:cover;
+    background-position: center center;
+    .title{
+        color:$white;
+        text-transform: uppercase;
+        font-weight: 700;
+        font-size: 48px;
+        line-height: 50px;
+    }
+    .subtitle{
+        color:$white;
+    }
+}
+@media(max-width:900px) {
+    .static-slider10 {
+        .title {
+            font-size:40px;
+            line-height: 45px;
+        }
+    }
+}
+
+/*******************
+Static slide 3
+*******************/
+
+.static-slider3{
+    padding: 10% 0;
+    h1{
+        font-weight: 300;
+        line-height: 50px;
+        span{
+            border-bottom:3px solid $success;
+        }
+    }
+    
+}
+@media(max-width:767px) {
+.static-slider3{    
+        h1{
+            line-height: 30px;
+            font-size:24px;
+        } 
+    }
+}
+
+/*******************
+form-banner 1
+*******************/
+
+#banner1 {
+    background: right -3em center no-repeat #e9f3f8;
+    h2 {
+        font-size: 48px;
+        line-height: 1;
+        letter-spacing: -1px;
+    }
+    input {
+        line-height: 72px;
+        padding: 0;
+        margin: 0;
+        border: none;
+        display: inline-block;
+        vertical-align: top;
+    }
+    input[type="text"] {
+        color: $bodytext;
+        border-radius: 36px 0 0 36px;
+        text-indent: 35px;
+        padding-right: 15px;
+        width: 61%;
+        font-weight: 300;
+        box-shadow: -5px 0 30px 0 rgba(0, 0, 0, 0.05);
+        text-overflow: ellipsis;
+    }
+    input[type="submit"] {
+        border-radius: 0 36px 36px 0;
+        width: auto;
+        padding: 0 30px;
+        cursor: pointer;
+        margin-left: -4px;
+        box-shadow: 5px 0 30px 0 rgba(0, 0, 0, 0.05);
+        transition: all 0.5s ease-in-out;
+
+        &:hover {
+            opacity: 0.7;
+        }
+    }
+}
+
+@media (min-width: 2301px) and (max-width: 2700px) {
+    #banner1 {
+        background-position: 70% center;
+    }
+}
+
+@media (min-width: 1900px) and (max-width: 2300px) {
+    #banner1 {
+        background-position: 80% center;
+    }
+}
+
+@media (min-width: 1500px) and (max-width: 1680px) {
+    #banner1 {
+        background-position: right center;
+    }
+}
+
+@media (max-width: 1100px) {
+    #banner1 {
+        background-position: right -14em center;
+
+        h2 {
+            font-size: 40px;
+        }
+        input[type="text"] {
+            width: 59%;
+        }
+        input[type="submit"] {
+            padding: 0 20px;
+        }
+    }
+}
+
+@media (max-width: 992px) {
+    .banner {
+        height: auto !important;
+        padding: 100px 0;
+    }
+    #banner1 {
+        background-position: right -6em center;
+        background-size: 80%;
+
+        h2 {
+            font-size: 30px;
+        }
+    }
+}
+
+@media (max-width: 767px) {
+    .banner {
+        padding: 30px 0;
+    }
+    #banner1 {
+        background-size: 100%;
+        background-position: right center;
+
+        input[type="submit"] {
+            padding: 0 30px;
+        }
+        img {
+            margin-top: 25px;
+        }
+    }
+}
+
+@media (max-width: 590px) {
+    #banner1 {
+        background-image: none;
+    }
+}
+
+@media (max-width: 428px) {
+    #banner1 {
+        input {
+            font-size: 14px;
+            line-height: 50px;
+        }
+        input[type="text"] {
+            border-radius: 25px 0 0 25px;
+            text-indent: 20px;
+        }
+        input[type="submit"] {
+            border-radius: 0 25px 25px 0;
+            padding: 0 15px;
+        }
+    }
+}
+
+@media (max-width: 320px) {
+    #banner1 {
+        input[type="submit"] {
+            padding: 0 10px;
+        }
+    }
+}
+
+/*******************
+Feature 4
+*******************/
+
+.wrap-feature4-box {
+    .icon-round {
+        font-size: 45px;
+        width: 80px;
+        color: $themecolor;
+        line-height: 80px;
+        text-align: center;
+        display: inline-block;
+        margin: 20px 0 30px;
+        border-radius: 100%;
+    }
+}
+
+/*******************
+Feature 20
+*******************/
+.wrap-feature-20 {
+    margin-top: 60px;
+    [class*=col-lg-6] {
+        .card{
+            overflow: hidden;
+        }
+    }
+    .linking {
+        width: 100%;
+        display: block;
+        padding:35px 0;
+    }
+}
+
+/*******************
+Feature 30
+*******************/
+.feature30{
+    position: relative;
+}
+.wrap-feature30-box{
+    position: absolute;
+    top:20%;
+    right: 0px;
+}
+
+/*******************
+Portfolio 1
+*******************/
+.img-ho{
+    overflow:hidden;
+    img{
+        transition:0.1s ease-in;
+        &:hover{
+            transform:scale(1.1);
+        }
+    }
+}  
+
+/*******************
+Pricing 8
+*******************/
+.pricing8{
+    .pricing-box{
+        sup{
+            top:-20px;
+            font-size: 16px;
+        }
+        .btn{
+            border-top-left-radius: 0px;
+            border-top-right-radius: 0px;
+        }   
+    }
+}
+
+/*******************
+team 2
+*******************/ 
+.team2{
+    .pro-pic{
+        min-height:200px;
+        .card-img-overlay{
+            background: rgba(26, 139, 243, 0.87);
+            display: none;
+            
+            ul{
+                position: relative;
+                top:50%;
+                text-align: center;
+                li a{
+                    color:$white;
+                    padding:0 10px;
+                    transition: 0.1s ease-in;
+                    display: block;
+                    &:hover{
+                        
+                        transform: translate3d(0px, -5px, 0px);
+                    }
+                }
+            }
+        }
+        &:hover{
+            .card-img-overlay{
+                display: block;
+            }
+        }
+    } 
+    .title{
+        margin: 30px 0 0 0;
+    }
+    .subtitle{
+        margin: 0 0 20px 0; 
+        font-size: 13px;
+    }
+}
+
+/*******************
+Testimonial 3
+*******************/
+  
+  .testimonial3 {
+      .testi3 {
+          .card-body {
+              padding: 40px;
+          }
+          h6 {
+              line-height: 26px;
+          }
+          .thumb-img {
+              img {
+                  width: 60px;
+              }
+          }
+          .customer {
+              text-transform: uppercase;
+              font-size: 14px;
+              font-weight: 500;
+          }
+      }
+  }
+
+/*******************
+Blog homepage 2
+*******************/
+  
+.blog-home2 {
+    [class*=col-] {
+          transition: 0.2s ease-in;
+          &:hover {
+              transform: translateY(-10px);
+          } 
+      }
+    .date-pos{
+        padding: 10px;
+        display: inline-block;
+        position: absolute;
+        right:10px;
+        top:10px;
+        color:$white;
+        border-radius: $radius;
+        text-align: center;
+        span{
+            display: block;
+            font-size: 30px;
+            line-height: 30px;
+        }
+    }
+}
+
+/*******************
+Responsive
+*******************/
+@media(max-width:1024px) {
+    .static-slider10{
+        .title{
+                font-size:60px;
+                line-height: 60px;
+            }
+    }
+    .topbar {
+        background: $dark;
+    }
+
+}

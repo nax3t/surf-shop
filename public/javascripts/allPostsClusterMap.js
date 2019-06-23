@@ -120,3 +120,8 @@ map.on('load', function() {
     map.on('mouseenter', 'unclustered-point', mouseenterCursor);
     map.on('mouseleave', 'unclustered-point', mouseLeaveCursor);
 });
+
+// Disable zoom from mouse scrollwheel
+map.scrollZoom.disable();
+// Add zoom and rotation controls to the map.
+map.addControl(new mapboxgl.NavigationControl());
