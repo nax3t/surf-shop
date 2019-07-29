@@ -1,0 +1,78 @@
+/*
+Template Name: Wrapkit
+Author: wrappixel
+Email: niravjoshi87@gmail.com
+File: scss
+*/
+
+// Variables - here you can change this global values of the UI Kit
+
+$bodyfont:'Montserrat', sans-serif;
+$headingfont:'Montserrat', sans-serif;
+$stylishfont: 'Calafia-Regular';
+
+/*Theme Colors*/
+$bodycolor: #ffffff;
+$headingtext: #3e4555;
+$bodytext: #8d97ad; 
+$themecolor: #316ce8; 
+$themecolor-alt: #26c6da;
+$themecolor-dark: #028ee1;
+
+/*bootstrap Color*/
+$danger: #ff4d7e;
+$success: #2cdd9b;
+$warning: #fec500;
+$primary: #316ce8;
+$info: #188ef4;
+$inverse: #3e4555;
+$muted: #8d97ad;
+$dark: #263238;
+$light: #f4f8fa;
+$extra-light: #ebf3f5;
+$secondary: #727b84;
+$facebook: #3b5a9a;
+$twitter: #56adf2;
+
+/*Light colors*/
+$light-danger: #f9e7eb;
+$light-success: #e8fdeb;
+$light-warning: #fff8ec;
+$light-primary: #f1effd;
+$light-info: #cfecfe;
+$light-inverse: #f6f6f6;
+$light-megna: #e0f2f4; 
+
+
+
+$danger-dark: #d73e6b;
+$success-dark: #1dc8cc;
+$warning-dark: #dcaf17;
+$primary-dark: #345bcb;
+$info-dark: #2c73cb;
+$red-dark: #d61f1f;
+$inverse-dark: #232a37;
+$dark-transparent:rgba(0, 0, 0, 0.05);
+
+/*Normal Color*/
+$white: #ffffff;
+$red: #fb3a3a;
+$yellow: #fed700;
+$purple: #7460ee;
+$blue: #02bec9;
+$megna: #1dc8cd;
+$orange:#ff6a5b;
+/*Extra Variable*/
+$rgt: right;
+$lft: left;
+$border: rgba(120, 130, 140, 0.13);
+$radius: 4px;
+$card-shadow:0px 0px 30px rgba(115, 128, 157, 0.1);
+$img-shadow:0px 0px 30px rgba(115, 128, 157, 0.3);
+/*Gradiant*/
+
+@mixin linear-gradient($direction, $color-stops...) {
+  background: nth(nth($color-stops, 1), 1);
+  background: -webkit-linear-gradient(legacy-direction($direction), $color-stops);
+  background: linear-gradient($direction, $color-stops);
+}
