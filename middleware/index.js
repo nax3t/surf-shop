@@ -98,6 +98,9 @@ const middleware = {
 			if (location) {
 				let coordinates;
 				try {
+					if(typeof JSON.parse(location) === 'number') {
+						throw new Error;
+					}
 					location = JSON.parse(location);
 					coordinates = location;
 				} catch(err) {
