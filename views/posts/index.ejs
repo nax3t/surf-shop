@@ -1,8 +1,10 @@
-<% layout('layouts/boilerplate') -%>
-<h1>Posts Index!</h1>
+<% layout('layouts/postsIndex') -%>
 
-<div class="container-fluid">
+<div class="container-fluid p-5">
 	<div class="row">
+		<div class="col-md-12">
+			<h1>Posts Index!</h1>
+		</div>
 		<div class="col-4">
 			<% include ../partials/searchFilter %>
 		</div>
@@ -10,21 +12,22 @@
 			<div id="map"></div>
 		</div>
 	</div>
-</div>
 
-<% include ../partials/paginatePosts %>
+	<% include ../partials/paginatePosts %>
 
-<% posts.docs.forEach(function(post) { %>
-	<div>
-		<h2><%= post.title %></h2>
-		<div>Price: <%= post.price %></div>
-		<div><%= post.description %></div>
-		<div><%= post.location %></div>
-		<div><a href="/posts/<%= post.id %>">View more</a></div>
-	</div>
-<% }); %>
+	<% posts.docs.forEach(function(post) { %>
+		<div>
+			<h2><%= post.title %></h2>
+			<div>Price: <%= post.price %></div>
+			<div><%= post.description %></div>
+			<div><%= post.location %></div>
+			<div><a href="/posts/<%= post.id %>">View more</a></div>
+		</div>
+	<% }); %>
 
-<% include ../partials/paginatePosts %>
+	<% include ../partials/paginatePosts %>
+
+</div> <!-- /.container-fluid -->
 
 <script>
 	mapboxgl.accessToken = "<%= mapBoxToken %>";
