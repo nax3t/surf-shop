@@ -24,7 +24,8 @@ const app = express();
 // connect to the database
 mongoose.connect('mongodb://localhost:27017/surf-shop', {
   useNewUrlParser: true,
-  useCreateIndex: true
+  useCreateIndex: true,
+  useUnifiedTopology: true
 });
 
 const db = mongoose.connection;
