@@ -22,7 +22,7 @@ const reviews = require('./routes/reviews');
 const app = express();
 
 // connect to the database
-mongoose.connect('mongodb://localhost:27017/surf-shop', {
+mongoose.connect(process.env.DB_URL || 'mongodb://localhost:27017/surf-shop', {
   useNewUrlParser: true,
   useCreateIndex: true,
   useUnifiedTopology: true
