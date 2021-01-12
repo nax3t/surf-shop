@@ -1,65 +1,88 @@
-<form action="/posts" method="GET">
-	<fieldset>
-		<legend>Search</legend>
+<form action="/posts" method="GET" class="row mb-3">
+	<fieldset class="col-12 my-2">
+		<!-- <legend>Search</legend> -->
 		<label for="search">Search</label>
-		<input type="text" id="search" placeholder="Search" name="search" value="<%= query.search %>">
+		<input type="text" class="form-control" id="search" placeholder="Search" name="search" value="<%= query.search %>">
 	</fieldset>
-
-	<fieldset>
+	
+	<fieldset class="col-12 my-2">
 		<div>
 			<label for="location">Location</label>
-			<input type="text" id="location" name="location" value="<%= query.location %>" placeholder="Address or Zipcode"><br/>
-			<small><a href="#" id="find-me">use my location</a></small><br/>
-			<p id="status"></p>
+			<input type="text" id="location" name="location" class="form-control" value="<%= query.location %>" placeholder="Address or Zipcode">
+			<small class="d-block mt-1"><a href="#" id="find-me">Use my location</a></small>
+			<p id="status" class="my-1"></p>
 		</div>
 		<legend>Distance (miles)</legend>
-		<div>
-			<input type="radio" name="distance" id="distance25" value="25" <%= query.distance === '25' ? 'checked' : '' %>>
-			<label for="distance25">25</label>
+		<div class="row">
+			<div class="col-4">
+				<input type="radio" name="distance" id="distance25" value="25" <%= query.distance === '25' ? 'checked' : '' %>>
+				<label for="distance25">25</label>
+			</div>
+			<div class="col-4">
+				<input type="radio" name="distance" id="distance50" value="50" <%= query.distance === '50' ? 'checked' : '' %>>
+				<label for="distance50">50</label>
+			</div>
+			<div class="col-4">
+				<input type="radio" name="distance" id="distance100" value="100" <%= query.distance === '100' ? 'checked' : '' %>>
+				<label for="distance100">100</label>
+			</div>
 		</div>
 		<div>
-			<input type="radio" name="distance" id="distance50" value="50" <%= query.distance === '50' ? 'checked' : '' %>>
-			<label for="distance50">50</label>
-		</div>
-		<div>
-			<input type="radio" name="distance" id="distance100" value="100" <%= query.distance === '100' ? 'checked' : '' %>>
-			<label for="distance100">100</label>
-		</div>
-		<div>
-			<a href="#" id="clear-distance">clear</a>
+			<a href="#" id="clear-distance">Clear</a>
 		</div>
 	</fieldset>
-
-	<fieldset>
+	
+	<fieldset class="col-12 my-2">
 		<legend>Price</legend>
-		<label for="min">Min</label>
-		<input type="text" id="min" name="price[min]" min="0" max="10000" step="1" placeholder="Min" value="<%= query.price ? query.price.min : '' %>">		
+		<div class="row">
+			<div class="col-6">
+				<label for="min">Min</label>
+				<input type="text" class="form-control" id="min" name="price[min]" min="0" max="10000" step="1" placeholder="Min" value="<%= query.price ? query.price.min : '' %>">	
+			</div>	
 
-		<label for="max">Max</label>
-		<input type="text" id="max" name="price[max]" min="0" max="10000" step="1" placeholder="Max" value="<%= query.price ? query.price.max : '' %>">
+			<div class="col-6">
+				<label for="max">Max</label>
+				<input type="text" class="form-control" id="max" name="price[max]" min="0" max="10000" step="1" placeholder="Max" value="<%= query.price ? query.price.max : '' %>">
+			</div>
+		</div>
 	</fieldset>
-
-	<fieldset>
-		<legend>Rating</legend>
-		<input type="checkbox" id="zero-stars" value="0" name="avgRating[]" <%= query.avgRating && query.avgRating.includes('0') ? 'checked' : '' %>>
-		<label for="zero-stars">0 stars</label>
-		<input type="checkbox" id="one-star" value="1" name="avgRating[]" <%= query.avgRating && query.avgRating.includes('1') ? 'checked' : '' %>>
-		<label for="one-star">1 star</label>
-		<input type="checkbox" id="two-stars" value="2" name="avgRating[]" <%= query.avgRating && query.avgRating.includes('2') ? 'checked' : '' %>>
-		<label for="two-stars">2 stars</label>
-		<input type="checkbox" id="three-stars" value="3" name="avgRating[]" <%= query.avgRating && query.avgRating.includes('3') ? 'checked' : '' %>>
-		<label for="three-stars">3 stars</label>
-		<input type="checkbox" id="four-stars" value="4" name="avgRating[]" <%= query.avgRating && query.avgRating.includes('4') ? 'checked' : '' %>>
-		<label for="four-stars">4 stars</label>
-		<input type="checkbox" id="five-stars" value="5" name="avgRating[]" <%= query.avgRating && query.avgRating.includes('5') ? 'checked' : '' %>>
-		<label for="five-stars">5 stars</label>
+	
+	<fieldset class="col-12 my-2">
+		<legend>Rating <small>(Stars)</small></legend>
+		<div class="rating-group justify-content-between">
+			<div>
+				<input type="checkbox" id="zero-stars" value="0" name="avgRating[]" <%= query.avgRating && query.avgRating.includes('0') ? 'checked' : '' %>>
+				<label for="zero-stars">0</label>
+			</div>
+			<div>
+				<input type="checkbox" id="one-star" value="1" name="avgRating[]" <%= query.avgRating && query.avgRating.includes('1') ? 'checked' : '' %>>
+				<label for="one-star">1</label>
+			</div>
+			<div>
+				<input type="checkbox" id="two-stars" value="2" name="avgRating[]" <%= query.avgRating && query.avgRating.includes('2') ? 'checked' : '' %>>
+				<label for="two-stars">2</label>
+			</div>
+			<div>
+				<input type="checkbox" id="three-stars" value="3" name="avgRating[]" <%= query.avgRating && query.avgRating.includes('3') ? 'checked' : '' %>>
+				<label for="three-stars">3</label>
+			</div>
+			<div>
+				<input type="checkbox" id="four-stars" value="4" name="avgRating[]" <%= query.avgRating && query.avgRating.includes('4') ? 'checked' : '' %>>
+				<label for="four-stars">4</label>
+			</div>
+			<div>
+				<input type="checkbox" id="five-stars" value="5" name="avgRating[]" <%= query.avgRating && query.avgRating.includes('5') ? 'checked' : '' %>>
+				<label for="five-stars">5</label>
+			</div>
+		</div>
 	</fieldset>
-
-	<div>
-		<a href="/posts">reset form</a>
+	
+	<div class="col-12">
+		<input type="submit" class="btn btn-sm btn-info">
+		<a href="/posts" class="btn btn-danger btn-sm">Reset form</a>
 	</div>
 
-	<input type="submit">
 </form>
+
 
 <script src="/javascripts/use-my-location.js"></script>

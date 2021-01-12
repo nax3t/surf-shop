@@ -1,17 +1,23 @@
-<% layout('layouts/boilerplate') -%>
-
-<h1>Reset Password</h1>
-
-<form action="/reset/<%= token %>?_method=PUT" method="POST">
-	<div>
-		<label for="password">New Password</label>
-		<input type="password" name="password" id="password" placeholder="New password" autofocus>
-	</div>
-	<div>
-		<label for="confirm">Confirm Password</label>
-		<input type="password" name="confirm" id="confirm" placeholder="Confirm password">
-	</div>
-	<div>
-		<input type="submit" value="Update Password">
-	</div>
-</form>
+<% layout('layouts/boilerWithoutBanner') -%>
+<h2 class="text-center title mt-5">
+   Reset Password
+</h2>
+<div class="container my-5">
+   <div class="row justify-content-center">
+      <div class="col-md-8">
+         <form class="row" action="/reset/<%= token %>?_method=PUT" method="POST">
+            <div class="form-group col-12">
+               <label for="password">New Password</label>
+               <input type="password" class="form-control" name="password" id="password" placeholder="New password" autofocus>
+            </div>
+            <div class="form-group col-12">
+               <label for="confirm">Confirm Password</label>
+               <input type="password" class="form-control" name="confirm" id="confirm" placeholder="Confirm password">
+            </div>
+            <div class="col-md-12">
+               <button type="submit" class="btn btn-info waves-effect waves-light m-r-10">Update Password</button>
+            </div>
+         </form>
+      </div>
+   </div>
+</div>

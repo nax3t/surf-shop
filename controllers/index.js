@@ -18,6 +18,10 @@ module.exports = {
   },
   // GET /register
   getRegister(req, res, next) {
+    if (req.isAuthenticated()) {
+      req.flash('Please logout before ')
+      return res.redirect('back');
+    }
     res.render('register', { title: 'Register', username: '', email: '' });
   },
   // POST /register
@@ -170,7 +174,7 @@ module.exports = {
       If you did not make this change, please hit reply and notify us at once.`.replace(/     /g, '')
     };
 
-    await sgMail.send(msg);
+	await sgMail.send(msg);
 
     req.session.success = 'Password successfully updated!';
     res.redirect('/');

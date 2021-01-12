@@ -1,25 +1,51 @@
-<% layout('layouts/boilerplate') -%>
-<h1>Edit Post!</h1>
-
-<form action="/posts/<%= post.id %>?_method=PUT" method="POST" id="postEditForm" enctype="multipart/form-data">
-	<div><input type="text" name="post[title]" placeholder="Title" value="<%= post.title  %>"></div>
-	<div><input type="number" name="post[price]" step=".01" placeholder="Price" value="<%= post.price  %>"></div>
-	<div>
-		<input type="file" id="imageUpload" accept="images/*" name="images" multiple />
-		<div>
-		<% post.images.forEach(function(image, i) { %>
-			<img src="<%= image.url %>" width="100px" />
-			<label for="image<%= i %>">Delete?</label>
-			<input type="checkbox" name="deleteImages[]" class="imageDeleteCheckbox" id="image<%= i %>" value="<%= image.public_id %>">
-		<% }); %>
-		</div>
-	</div>
-	<div>
-		<textarea name="post[description]" placeholder="Description"><%= post.description  %></textarea>
-	</div>
-	<div><input type="text" name="post[location]" placeholder="Location" value="<%= post.location  %>"></div>
-
-	<input type="submit">
-</form>
-
-<script src="/javascripts/post-edit.js"></script>
+<% layout('layouts/boilerWithoutBanner') -%>
+<% include ../partials/flash-messages %>
+<h2 class="text-center title mt-5">
+   Edit post
+</h2>
+<div class="container my-5">
+   <div class="row justify-content-center">
+      <div class="col-md-8">
+         <form class="row" action="/posts/<%= post.id %>?_method=PUT" method="POST" id="postEditForm" enctype="multipart/form-data">
+            <div class="form-group col-12">
+               <label for="title">Title:</label>
+               <input type="text" name="post[title]" class="form-control" id="title" placeholder="Title" value="<%= post.title  %>">
+            </div>
+            <div class="form-group col-12">
+               <label for="price">Price:</label>
+               <input type="number" name="post[price]" class="form-control" id="value" step=".01" placeholder="Price" value="<%= post.price  %>">
+            </div>
+            <p class="mimicLabel mx-3">
+               Images:
+            </p>
+            <div class="custom-file mx-3 mb-3">
+               <input type="file" accept="images/*" class="custom-file-input" name="images" id="imageUpload" multiple />
+               <label class="custom-file-label" for="imageUpload">Choose file</label>
+            </div>
+            <p class="mx-3 mb-1">
+               Click Checkboxes to Delete Images
+            </p>
+            <div class="my-2 mx-3 row px-0 w-100">
+               <% post.images.forEach(function(image, i, arr) { %>
+               <div class="col-6 col-sm-3  px-1 flex-column my-2 pb-4" style="position: relative;">
+                  <img src="<%= image.url %>"  class="mb-2 img-fluid" />
+                  <!-- <label for="image<%= i %>">Delete?</label> -->
+                  <input type="checkbox" name="deleteImages[]" class="imageDeleteCheckbox d-block mx-auto" id="image<%= i %>" value="<%= image.public_id %>">
+               </div>
+               <% }); %>
+            </div>
+            <div class="form-group col-12">
+               <label for="description">Description:</label>
+               <textarea name="post[description]" placeholder="Description" id="description" class="form-control"><%= post.description  %></textarea>
+            </div>
+            <div class="form-group col-12">
+               <label for="location">Location:</label>
+               <input type="text" name="post[location]" id="location" class="form-control" placeholder="Location" value="<%= post.location  %>">
+            </div>
+            <div class="col-md-12">
+               <button type="submit" class="btn btn-info waves-effect waves-light m-r-10">Submit</button>
+            </div>
+         </form>
+      </div>
+   </div>
+</div>

@@ -1,18 +1,27 @@
-<% layout('layouts/boilerplate') -%>
-
-<form action="/login" method="POST">
-	<div>
-		<label for="username">Username:</label>
-		<input type="text" id="username" name="username" placeholder="username" required>
-	</div>
-	<div>
-		<label for="password">Password:</label>
-		<input type="password" id="password" name="password" placeholder="password" required>
-	</div>
-
-	<input type="submit">
-</form>
-
-<div>
-	<a href="/forgot-password">Forgot password?</a>
+<% layout('layouts/boilerWithoutBanner') -%>
+<% include ./partials/flash-messages %>
+<h2 class="text-center title mt-5">
+   Login
+</h2>
+<div class="container my-5">
+   <div class="row justify-content-center">
+      <div class="col-md-8">
+         <form class="row" action="/login" method="POST">
+            <div class="form-group col-12">
+               <label for="username">Username:</label>
+               <input type="text" class="form-control" id="username" name="username" placeholder="username" required>
+            </div>
+            <div class="form-group col-12">
+               <label for="password">Password:</label>
+               <input type="password" class="form-control" id="password" name="password" placeholder="password" required>
+            </div>
+            <div class="col-md-12">
+               <button type="submit" class="btn btn-info waves-effect waves-light m-r-10">Submit</button>
+            </div>
+         </form>
+      </div>
+      <div class="col-md-8 pl-3 my-3">
+         <a href="/forgot-password" class="text-themecolor">Forgot password?</a>
+      </div>
+   </div>
 </div>

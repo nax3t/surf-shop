@@ -1,33 +1,42 @@
 .logo {
-	color: #fff;
+    color: #fff;
 }
-<<<<<<< HEAD
 
-=======
->>>>>>> theme
 .logo:hover {
-	color: #fff;
+    color: #fff;
 }
 
 #map {
-	width: 100%;
-	height: 500px;
+    width: 100%;
+    height: 500px;
 }
 
 .mapboxgl-popup {
-	max-width: 400px;
-	font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    max-width: 400px;
+    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
 }
 
 .color-green {
-	color: green;
+    color: green;
 }
 
 .color-red {
-	color: red;
+    color: red;
 }
 
 .profile-image {
-	width: 100px;
-	border-radius: 50%;
+    width: 100px;
+    height: 100%;
+    border-radius: 50%;
+}
+
+.imageDeleteCheckbox {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 10px;
+}
+
+.rating-group {
+    display: flex;
 }

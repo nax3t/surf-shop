@@ -1,7 +1,19 @@
-<% if(success && success.length) { %>
-	<h1 class="color-green"><%= success %></h1>
-<% } %>
+<div class="container my-2 flash-div">
+		<% if(success && success.length) { %>
+		<div class="alert alert-success"> 
+			<%= success %>
+			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+		</div>
+	<% } %>
 
-<% if(error && error.length) { %>
-	<h1 class="color-red"><%= error %></h1>
-<% } %>
+	<% if(error && error.length) { %>
+		<div class="alert alert-danger"> 
+			<%= error %>
+			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+		</div>
+	<% } %>
+</div>

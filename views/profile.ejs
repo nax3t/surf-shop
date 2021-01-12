@@ -1,50 +1,60 @@
-<% layout('layouts/boilerplate') -%>
+<% layout('layouts/boilerWithoutBanner') -%>
+<% include ./partials/flash-messages %>
 
-<h1><img src="<%= currentUser.image.secure_url %>" alt="<%= currentUser.username %>'s profile image" class="profile-image"><%= currentUser.username %>'s Profile</h1>
+<div class="container my-4">
+	<div class="row align-items-center px-3">
+			<img src="<%= currentUser.image.secure_url %>" alt="<%= currentUser.username %>'s profile image" class="profile-image">
+			<h2 class="ml-3">
+				<%= currentUser.username %>'s Profile
+			</h2>
+	</div>
+	<div class="row my-3">
+		<div class="col-10">
+			<h4>Recent Posts:</h4>
+			<% posts.forEach(function(post) { %>
+			<div>
+				<a href="/posts/<%= post.id %>"><%= post.title %></a>
+			</div>
+			<% }); %>
+		</div>
+	</div>
+	<div class="row my-3">
+		<div class="col-12">
+			<h4>Update Info:</h4>
+			<form class="row" action="/profile?_method=PUT" method="POST" enctype="multipart/form-data">
+				<div class="form-group col-lg-6">
+					<label for="username">Username:</label>
+					<input class="form-control" type="text" id="username" name="username" placeholder="username" value="<%= currentUser.username %>" autofocus required>
+				</div>
+				<div class="form-group col-lg-6">
+					<label for="current-password">Current Password (required to update profile):</label>
+					<input class="form-control" type="password" id="current-password" name="currentPassword" placeholder="current password" required>
+				</div>
+				<div class="form-group col-lg-6">
+					<label for="new-password">New Password:</label>
+					<input class="form-control" type="password" id="new-password" name="newPassword" placeholder="new password">
+				</div>
+				<div class="form-group col-lg-6">
+					<label for="password-confirmation">Password Confirmation:</label>
+					<input class="form-control" type="password" id="password-confirmation" name="passwordConfirmation" placeholder="password confirmation">
+				</div>
+				<div id="validation-message"></div>
+				<div class="form-group col-12">
+					<label for="email">Email:</label>
+					<input class="form-control" type="text" id="email" name="email" placeholder="email" value="<%= currentUser.email %>">
+				</div>
+				<p class="mimicLabel mx-3">
+					Image: <small>(this deletes existing)</small>
+				</p>
+				<div class="custom-file mx-3 mb-3">
+					<input type="file" class="custom-file-input" name="image" id="image">
+					<label class="custom-file-label" for="image">Choose file</label>
+				</div>
 
-<p>Recent Posts:</p>
-
-<% posts.forEach(function(post) { %>
-<div>
-	<a href="/posts/<%= post.id %>"><%= post.title %></a>
+				<input type="submit" id="update-profile" class="ml-3 btn btn-info waves-effect waves-light">
+			</form>
+		</div>
+	</div>
 </div>
-<% }); %>
-
-<p>Update Info:</p>
-
-<form action="/profile?_method=PUT" method="POST" enctype="multipart/form-data">
-	<div>
-		<label for="username">Username:</label>
-		<input type="text" id="username" name="username" placeholder="username" value="<%= currentUser.username %>" autofocus required>
-	</div>
-	<div>
-		<label for="current-password">Current Password (required to update profile):</label>
-		<input type="password" id="current-password" name="currentPassword" placeholder="current password" required>
-	</div>
-	<div>
-		<label for="new-password">New Password:</label>
-		<input type="password" id="new-password" name="newPassword" placeholder="new password">
-	</div>
-	<div>
-		<label for="password-confirmation">Password Confirmation:</label>
-		<input type="password" id="password-confirmation" name="passwordConfirmation" placeholder="password confirmation">
-	</div>
-	<div id="validation-message"></div>
-	<div>
-		<label for="email">Email:</label>
-		<input type="text" id="email" name="email" placeholder="email" value="<%= currentUser.email %>">
-	</div>
-	<div>
-		<label for="image">Image:</label>
-		<small>(this deletes existing)</small>
-		<input type="file" id="image" name="image">
-	</div>
-
-	<input type="submit" id="update-profile">
-</form>
 
 <script src="/javascripts/profile.js"></script>
-
-
-
-

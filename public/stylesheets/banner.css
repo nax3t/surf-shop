@@ -1,3 +1,10 @@
+/*
+* Prefixed by https://autoprefixer.github.io
+* PostCSS: v7.0.29,
+* Autoprefixer: v9.7.6
+* Browsers: last 4 version
+*/
+
 .static-slider-head {
     min-height: 90px;
     display: -webkit-box;
@@ -26,5 +33,12 @@
     color: #ffffff;
     line-height: 30px;
 }
-COPY TO CLIPBOARD SELECT ALL
-© FreeFormatter.com
+
+@media (max-width: 1023px) {
+    .static-slider-head {
+        display: none;
+    }
+    .topbar {
+        background: #263238;
+    }
+}

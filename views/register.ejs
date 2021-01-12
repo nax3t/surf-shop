@@ -1,22 +1,39 @@
-<% layout('layouts/boilerplate') -%>
-
-<form action="/register" method="POST" enctype="multipart/form-data">
-	<div>
-		<label for="username">Username:</label>
-		<input type="text" id="username" name="username" placeholder="username" value="<%= username %>" required>
-	</div>
-	<div>
-		<label for="password">Password:</label>
-		<input type="password" id="password" name="password" placeholder="password" required>
-	</div>
-	<div>
-		<label for="email">Email:</label>
-		<input type="email" id="email" name="email" placeholder="email" value="<%= email %>" required>
-	</div>
-	<div>
-		<label for="image">Image:</label>
-		<input type="file" id="image" name="image">
-	</div>
-
-	<input type="submit">
-</form>
+<% layout('layouts/boilerWithoutBanner') -%>
+<% include ./partials/flash-messages %>
+<h2 class="text-center title mt-5">
+   Register
+</h2>
+<div class="container my-5">
+   <div class="row justify-content-center">
+      <div class="col-md-8">
+         <form class="row" action="/register" method="POST" enctype="multipart/form-data">
+            <div class="form-group col-md-6">
+               <label for="username">Username:</label>
+               <input type="text" class="form-control" id="username" name="username" placeholder="username" value="<%= username %>" required>
+            </div>
+            <div class="form-group col-md-6">
+               <label for="password">Password:</label>
+               <input type="password" class="form-control" id="password" name="password" placeholder="password" required>
+            </div>
+            <div class="form-group col-md-12">
+               <label for="email">Email:</label>
+               <input type="email" class="form-control" id="email" name="email" placeholder="email" value="<%= email %>" required>
+            </div>
+            <!-- <div class="form-group col-md-12">
+               <label for="image">Image:</label>
+               <input type="file" class="form-control-file" id="image" name="image">
+               </div> -->
+            <p class="mimicLabel mx-3">
+               Image:
+            </p>
+            <div class="custom-file mx-3 mb-3">
+               <input type="file" class="custom-file-input" name="image" id="image">
+               <label class="custom-file-label" for="image">Choose file</label>
+            </div>
+            <div class="col-md-12">
+               <button type="submit" class="btn btn-info waves-effect waves-light m-r-10">Submit</button>
+            </div>
+         </form>
+      </div>
+   </div>
+</div>

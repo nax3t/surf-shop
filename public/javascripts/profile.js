@@ -21,3 +21,4 @@ confirmation.addEventListener('input', e => {
 		submitBtn.removeAttribute('disabled');
 	}
 });
+

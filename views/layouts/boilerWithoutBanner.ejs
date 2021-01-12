@@ -10,9 +10,9 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <!-- Theme Styles -->
     <link rel="stylesheet" href="/wrapkit/css/style.css" />
-    <link rel="stylesheet" href="/stylesheets/posts-index.css" />
     <!-- Custom Styles -->
     <link rel="stylesheet" href="/stylesheets/style.css" />
+	<link rel="stylesheet" href="/stylesheets/banner.css" />
     <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v2.3.0/mapbox-gl-geocoder.css" type="text/css" />
     <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.51.0/mapbox-gl.css" rel="stylesheet" />
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.51.0/mapbox-gl.js"></script>
@@ -28,7 +28,6 @@
 
       <!-- Page Wrapper  -->
       <div class="page-wrapper">
-		
         <!-- Container fluid  -->
         <div class="container-fluid">
           <!-- Static Slider 10  -->
@@ -39,7 +38,6 @@
         </div>
         <!-- /Container fluid  -->
       </div>
-      <!-- /Page Wrapper  -->
 
     	<%- body -%>
       
@@ -108,6 +106,26 @@
         }, 1000);
         event.preventDefault();
       });
+		
+	  $(".custom-file-input").on("change", function() {
+		  var fileName = $(this).val().split("\\").pop();
+		  var numFiles = $(".custom-file-input")[0].files.length;
+		  if(numFiles > 1) {
+			  fileName += ` and ${numFiles - 1} more ${numFiles - 1 === 1 ? "image" : "images"}`;
+		  }
+		  $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+	  });
+		
+	  $(".mimicLabel").on("click", function() {
+		  $(this).siblings(".custom-file").children("input").focus();
+	  })
     </script>
   </body>
 </html>
+
+
+
+
+
+
+
