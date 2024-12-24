@@ -7,6 +7,7 @@ const favicon = require('serve-favicon');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
 const User = require('./models/user');
 const session = require('express-session');
 const mongoose = require('mongoose');
@@ -15,32 +16,19 @@ const seedPosts = require('./seeds');
 // seedPosts();
 
 // require routes
-const index 	= require('./routes/index');
-const posts 	= require('./routes/posts');
+const index = require('./routes/index');
+const posts = require('./routes/posts');
 const reviews = require('./routes/reviews');
 
 const app = express();
 
 // connect to the database
-mongoose.connect(process.env.DB_URL || 'mongodb://localhost:27017/surf-shop', {
-  useNewUrlParser: true,
-  useCreateIndex: true,
-  useUnifiedTopology: true
-});
+mongoose.connect(process.env.DB_URL || 'mongodb://localhost:27017/surf-shop');
 
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', () => {
-  console.log('we\'re connected!');
-});
-
-// use ejs-locals for all ejs templates:
-app.engine('ejs', engine);
 // view engine setup
+app.engine('ejs', engine);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
-// set public assets directory
-app.use(express.static('public'));
 
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
@@ -57,15 +45,53 @@ app.locals.moment = require('moment');
 app.use(session({
   secret: 'hang ten dude!',
   resave: false,
-  saveUninitialized: true
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 1000 * 60 * 60 * 24 // 1 day
+  }
 }));
 
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.use(User.createStrategy());
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
+// Configure Passport Local Strategy
+passport.use(new LocalStrategy({
+    usernameField: 'email',
+    passwordField: 'password'
+}, async (email, password, done) => {
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return done(null, false, { message: 'Incorrect email.' });
+        }
+        
+        console.log('Found user:', user);
+        console.log('Attempting to compare:', password, 'with:', user.password);
+        
+        const isValid = await user.comparePassword(password);
+        if (!isValid) {
+            return done(null, false, { message: 'Incorrect password.' });
+        }
+        return done(null, user);
+    } catch (err) {
+        return done(err);
+    }
+}));
+
+passport.serializeUser((user, done) => {
+    done(null, user.id);
+});
+
+passport.deserializeUser(async (id, done) => {
+    try {
+        const user = await User.findById(id);
+        done(null, user);
+    } catch (err) {
+        done(err);
+    }
+});
 
 // set local variables middleware
 app.use(function(req, res, next) {

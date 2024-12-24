@@ -1,37 +1,24 @@
 const express = require('express');
 const router = express.Router();
-const multer = require('multer');
-const { storage } = require('../cloudinary');
-const upload = multer({ storage });
 const { 
-	landingPage,
-	getRegister,
-	postRegister,
-	getLogin,
-	postLogin,
-	getLogout,
-	getProfile,
-	updateProfile,
-	getForgotPw,
-	putForgotPw,
-	getReset,
-	putReset
-} = require('../controllers');
-const {
-	asyncErrorHandler,
-	isLoggedIn,
-	isValidPassword,
-	changePassword
-} = require('../middleware')
+    landingPage,
+    getRegister,
+    postRegister,
+    getLogin,
+    postLogin,
+    getLogout,
+    getProfile
+} = require('../controllers/index');
+const { asyncErrorHandler } = require('../middleware/index');
 
-/* GET home/landing page. */
+/* GET home page. */
 router.get('/', asyncErrorHandler(landingPage));
 
 /* GET /register */
 router.get('/register', getRegister);
 
 /* POST /register */
-router.post('/register', upload.single('image'), asyncErrorHandler(postRegister));
+router.post('/register', asyncErrorHandler(postRegister));
 
 /* GET /login */
 router.get('/login', getLogin);
@@ -43,27 +30,6 @@ router.post('/login', asyncErrorHandler(postLogin));
 router.get('/logout', getLogout);
 
 /* GET /profile */
-router.get('/profile', isLoggedIn, asyncErrorHandler(getProfile));
-
-/* PUT /profile */
-router.put('/profile',
-	isLoggedIn,
-	upload.single('image'),
-	asyncErrorHandler(isValidPassword),
-	asyncErrorHandler(changePassword),
-	asyncErrorHandler(updateProfile)
-);
-
-/* GET /forgot */
-router.get('/forgot-password', getForgotPw);
-
-/* PUT /forgot */
-router.put('/forgot-password', asyncErrorHandler(putForgotPw));
-
-/* GET /reset/:token */
-router.get('/reset/:token', asyncErrorHandler(getReset));
-
-/* PUT /reset/:token */
-router.put('/reset/:token', asyncErrorHandler(putReset));
+router.get('/profile', asyncErrorHandler(getProfile));
 
 module.exports = router;

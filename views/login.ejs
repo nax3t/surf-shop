@@ -1,5 +1,5 @@
 <% layout('layouts/boilerWithoutBanner') -%>
-<% include ./partials/flash-messages %>
+<%- include('./partials/flash-messages') %>
 <h2 class="text-center title mt-5">
    Login
 </h2>
@@ -8,8 +8,8 @@
       <div class="col-md-8">
          <form class="row" action="/login" method="POST">
             <div class="form-group col-12">
-               <label for="username">Username:</label>
-               <input type="text" class="form-control" id="username" name="username" placeholder="username" required>
+               <label for="email">Email:</label>
+               <input type="email" class="form-control" id="email" name="email" placeholder="email" required>
             </div>
             <div class="form-group col-12">
                <label for="password">Password:</label>

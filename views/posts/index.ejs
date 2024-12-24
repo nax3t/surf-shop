@@ -1,17 +1,17 @@
 <% layout('layouts/postsIndex') -%>
-<% include ../partials/flash-messages %>
+<%- include('../partials/flash-messages') %>
 <div class="container-fluid px-4 py-3 px-lg-5">
    <div class="row justify-content-center">
       <div class="col-md-8">
          <div id="map"></div>
       </div>
       <div class="col-md-8">
-         <% include ../partials/searchFilter %>
+         <%- include('../partials/searchFilter') %>
       </div>
    </div>
    <div class="row justify-content-center">
       <div class="col-md-8">
-         <% include ../partials/paginatePosts %>
+         <%- include('../partials/paginatePosts') %>
          <% posts.docs.forEach(function(post) { %>
          <div class="post-item my-3">
             <h4><%= post.title %></h4>
@@ -22,7 +22,7 @@
          </div>
          <hr>
          <% }); %>
-         <% include ../partials/paginatePosts %>
+         <%- include('../partials/paginatePosts') %>
       </div>
    </div>
 </div>

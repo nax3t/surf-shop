@@ -193,14 +193,14 @@ let post = new Post(postData);
 +    <script src="https://kit.fontawesome.com/<replace-with-your-kit>.js"></script>
    </head>
    <body>
--   <% include ../partials/navbar %>
--   <% include ../partials/flash-messages %>
+-   <%- include('../partials/navbar') %>
+-   <%- include('../partials/flash-messages') %>
 -   <%- body -%>
 -    <% if (title === 'Posts Index') { %>
 +    <!-- Main Wrapper  -->
 +    <div id="main-wrapper">
-+     <% include ../partials/navbar %>
-+     <% include ../partials/flash-messages %>
++     <%- include('../partials/navbar') %>
++     <%- include('../partials/flash-messages') %>
 +
 +      <!-- Page Wrapper  -->
 +      <div class="page-wrapper">
@@ -326,8 +326,8 @@ let post = new Post(postData);
   <body>
     <!-- Main Wrapper  -->
     <div id="main-wrapper">
-      <% include ../partials/navbar %>
-      <% include ../partials/flash-messages %>
+      <%- include('../partials/navbar') %>
+      <%- include('../partials/flash-messages') %>
 
       <!-- Page Wrapper  -->
       <div class="page-wrapper">
