@@ -7,6 +7,7 @@
     "dev": "NODE_ENV=development nodemon"
   },
   "dependencies": {
+    "@faker-js/faker": "^9.3.0",
     "@mapbox/mapbox-sdk": "^0.16.1",
     "@sendgrid/mail": "^8.1.4",
     "bcryptjs": "^2.4.3",
@@ -17,7 +18,6 @@
     "ejs-mate": "^4.0.0",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
-    "faker": "^5.5.3",
     "method-override": "^3.0.0",
     "moment": "^2.29.4",
     "mongoose": "^8.9.2",
