@@ -6,7 +6,7 @@
 <div class="container my-5">
    <div class="row justify-content-center">
       <div class="col-md-8">
-         <form class="row" action="/register" method="POST">
+         <form class="row" action="/register" method="POST" enctype="multipart/form-data">
             <div class="form-group col-md-6">
                <label for="username">Username:</label>
                <input type="text" class="form-control" id="username" name="username" placeholder="username" value="<%= username %>" required>
@@ -18,6 +18,10 @@
             <div class="form-group col-md-12">
                <label for="email">Email:</label>
                <input type="email" class="form-control" id="email" name="email" placeholder="email" value="<%= email %>" required>
+            </div>
+            <div class="form-group col-md-12">
+               <label for="image">Profile Image:</label>
+               <input type="file" class="form-control-file" id="image" name="image" accept="image/*">
             </div>
             <div class="col-md-12">
                <button type="submit" class="btn btn-info waves-effect waves-light m-r-10">Submit</button>
