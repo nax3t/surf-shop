@@ -10,13 +10,11 @@ const storage = new CloudinaryStorage({
   cloudinary,
   params: {
     folder: 'surf-shop',
-    allowedFormats: ['jpeg', 'jpg', 'png'],
-    filename: function (req, file, cb) {
-      let buf = crypto.randomBytes(16);
-      buf = buf.toString('hex');
-      let uniqFileName = file.originalname.replace(/\.jpeg|\.jpg|\.png/ig, '');
-      uniqFileName += buf;
-      cb(undefined, uniqFileName);
+    format: (req, file) => file.mimetype.split('/')[1],
+    public_id: (req, file) => {
+      const buf = crypto.randomBytes(16).toString('hex');
+      const uniqFileName = file.originalname.replace(/\.jpeg|\.jpg|\.png/ig, '');
+      return uniqFileName + buf;
     }
   }
 });

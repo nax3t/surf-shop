@@ -33,16 +33,16 @@ module.exports = {
 		req.body.post.images = [];
 		for(const file of req.files) {
 			req.body.post.images.push({
-				url: file.secure_url,
-				public_id: file.public_id
+				url: file.path,
+				public_id: file.filename
 			});
 		}
 		let response = await geocodingClient
-		  .forwardGeocode({
-		    query: req.body.post.location,
-		    limit: 1
-		  })
-		  .send();
+			.forwardGeocode({
+				query: req.body.post.location,
+				limit: 1
+			})
+			.send();
 		req.body.post.geometry = response.body.features[0].geometry;
 		req.body.post.author = req.user._id;
 		let post = new Post(req.body.post);

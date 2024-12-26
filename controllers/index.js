@@ -83,6 +83,7 @@ async postRegister(req, res, next) {
   // GET /profile
   async getProfile(req, res, next) {
     const user = await User.findById(req.user._id);
-    res.render("profile", { user });
+    const posts = await Post.find({ author: req.user._id }).sort('-_id').exec();
+    res.render("profile", { user, posts });
   },
 };

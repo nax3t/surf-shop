@@ -11,7 +11,6 @@ const User = require('./models/user');
 const session = require('express-session');
 const mongoose = require('mongoose');
 const methodOverride = require('method-override');
-const flash = require('connect-flash');
 const seedPosts = require('./seeds');
 // seedPosts();
 
@@ -48,14 +47,23 @@ app.use(session({
   cookie: {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    emaxAge: 1000 * 60 * 60 * 24 // 24 hours
+    maxAge: 1000 * 60 * 60 * 24 // 24 hours
   }
 }));
 
-// Configure Passport and Flash
+// Configure Passport
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(flash());
+
+// Flash messages middleware
+app.use((req, res, next) => {
+  // Add flash method to request object
+  req.flash = (type, message) => {
+    req.session.flash = req.session.flash || {};
+    req.session.flash[type] = message;
+  };
+  next();
+});
 
 // Configure Passport Local Strategy
 passport.use(new LocalStrategy({
@@ -97,8 +105,15 @@ passport.deserializeUser(async (id, done) => {
 // Set local variables middleware
 app.use((req, res, next) => {
   res.locals.currentUser = req.user;
-  res.locals.success = req.flash('success');
-  res.locals.error = req.flash('error');
+  // Initialize flash messages
+  res.locals.success = '';
+  res.locals.error = '';
+  // Get flash messages and clear them
+  if (req.session.flash) {
+    res.locals.success = req.session.flash.success || '';
+    res.locals.error = req.session.flash.error || '';
+    delete req.session.flash;
+  }
   // set default page title
   res.locals.title = 'Surf Shop';
   next();
@@ -118,6 +133,10 @@ app.use(function(req, res, next) {
 
 // error handler
 app.use(function(err, req, res, next) {
+  // Log the error with stack trace
+  console.error('Error:', err);
+  if (err.stack) console.error(err.stack);
+  
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
