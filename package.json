@@ -21,7 +21,7 @@
     "method-override": "^3.0.0",
     "moment": "^2.29.4",
     "mongoose": "^8.9.2",
-    "mongoose-paginate": "^5.0.3",
+    "mongoose-paginate-v2": "^1.8.5",
     "mongose": "^0.0.2-security",
     "morgan": "^1.10.0",
     "multer": "^1.4.4",

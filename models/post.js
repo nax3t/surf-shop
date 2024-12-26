@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const Review = require('./review');
-const mongoosePaginate = require('mongoose-paginate');
+const mongoosePaginate = require('mongoose-paginate-v2');
 
 const PostSchema = new Schema({
 	title: String,
@@ -64,11 +64,3 @@ PostSchema.plugin(mongoosePaginate);
 PostSchema.index({ geometry: '2dsphere' });
 
 module.exports = mongoose.model('Post', PostSchema);
-
-
-
-
-
-
-
-

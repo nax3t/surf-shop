@@ -1,11 +1,15 @@
 const User = require("../models/user");
+const Post = require("../models/post");
+const mapBoxToken = process.env.MAPBOX_TOKEN;
 const passport = require("passport");
 const util = require("util");
 
 module.exports = {
   // GET /
-  landingPage(req, res, next) {
-    res.render("index", { title: "Surf Shop - Home" });
+  async landingPage(req, res, next) {
+    const posts = await Post.find({}).sort('-_id').exec();
+    const recentPosts = posts.slice(0, 3);
+    res.render('index', { posts, mapBoxToken, recentPosts, title: 'Surf Shop - Home' });
   },
 
   // GET /register
