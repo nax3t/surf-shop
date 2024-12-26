@@ -5,13 +5,13 @@ const engine = require('ejs-mate');
 const path = require('path');
 const favicon = require('serve-favicon');
 const logger = require('morgan');
-const cookieParser = require('cookie-parser');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const User = require('./models/user');
 const session = require('express-session');
 const mongoose = require('mongoose');
 const methodOverride = require('method-override');
+const flash = require('connect-flash');
 const seedPosts = require('./seeds');
 // seedPosts();
 
@@ -34,7 +34,6 @@ app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(methodOverride('_method'));
 
@@ -49,12 +48,14 @@ app.use(session({
   cookie: {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    maxAge: 1000 * 60 * 60 * 24 // 1 day
+    emaxAge: 1000 * 60 * 60 * 24 // 24 hours
   }
 }));
 
+// Configure Passport and Flash
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(flash());
 
 // Configure Passport Local Strategy
 passport.use(new LocalStrategy({
@@ -93,24 +94,13 @@ passport.deserializeUser(async (id, done) => {
     }
 });
 
-// set local variables middleware
-app.use(function(req, res, next) {
-  // req.user = {
-  //   // '_id' : '5bb27cd1f986d278582aa58c',
-  //   // '_id' : '5bc521c0b142b6d7f7523406',
-  //   '_id' : '5bfed10ad176f845e38aec92',
-  //   'username' : 'ian3'
-  // }
+// Set local variables middleware
+app.use((req, res, next) => {
   res.locals.currentUser = req.user;
+  res.locals.success = req.flash('success');
+  res.locals.error = req.flash('error');
   // set default page title
   res.locals.title = 'Surf Shop';
-  // set success flash message
-  res.locals.success = req.session.success || '';
-  delete req.session.success;
-  // set error flash message
-  res.locals.error = req.session.error || '';
-  delete req.session.error;
-  // continue on to next function in middleware chain
   next();
 });
 

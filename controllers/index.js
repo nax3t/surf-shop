@@ -15,10 +15,10 @@ module.exports = {
   // GET /register
   getRegister(req, res, next) {
     if (req.isAuthenticated()) {
-      req.flash("Please logout before ");
-      return res.redirect("back");
+      req.flash('error', 'Please logout before registering a new user.');
+      return res.redirect('back');
     }
-    res.render("register", { title: "Register", username: "", email: "" });
+    res.render('register', { title: 'Register', username: '', email: '' });
   },
 
 // POST /register
