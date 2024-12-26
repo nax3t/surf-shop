@@ -40,9 +40,17 @@ const middleware = {
 		res.redirect('back');
 	},
 	isValidPassword: async (req, res, next) => {
-		const { user } = await User.authenticate()(req.user.username, req.body.currentPassword);
-		if (user) {
-			// add user to res.locals
+		const user = await User.findById(req.user._id);
+		const { currentPassword } = req.body;
+		
+		if (!currentPassword) {
+			middleware.deleteProfileImage(req);
+			req.session.error = 'Current password is required!';
+			return res.redirect('/profile');
+		}
+
+		const valid = await user.comparePassword(currentPassword);
+		if (valid) {
 			res.locals.user = user;
 			next();
 		} else {
@@ -76,7 +84,7 @@ const middleware = {
 		}
 	},
 	deleteProfileImage: async req => {
-		if (req.file) await cloudinary.v2.uploader.destroy(req.file.public_id);
+		if (req.file) await cloudinary.uploader.destroy(req.file.public_id);
 	},
 	async searchAndFilterPosts(req, res, next) {
 		const queryKeys = Object.keys(req.query);
@@ -149,24 +157,4 @@ const middleware = {
 	}
 };
 
-
-
-
-
-
-
-
-
-
 module.exports = middleware;
-
-
-
-
-
-
-
-
-
-
-

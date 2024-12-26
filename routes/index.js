@@ -10,9 +10,14 @@ const {
     getLogin,
     postLogin,
     getLogout,
-    getProfile
+    getProfile,
+    updateProfile,
+    getForgotPw,
+    putForgotPw,
+    getReset,
+    putReset
 } = require('../controllers/index');
-const { asyncErrorHandler } = require('../middleware/index');
+const { asyncErrorHandler, isLoggedIn, isValidPassword } = require('../middleware/index');
 
 /* GET home page. */
 router.get('/', asyncErrorHandler(landingPage));
@@ -33,6 +38,26 @@ router.post('/login', asyncErrorHandler(postLogin));
 router.get('/logout', getLogout);
 
 /* GET /profile */
-router.get('/profile', asyncErrorHandler(getProfile));
+router.get('/profile', isLoggedIn, asyncErrorHandler(getProfile));
+
+/* PUT /profile */
+router.put('/profile', 
+  isLoggedIn,
+  upload.single('image'),
+  asyncErrorHandler(isValidPassword),
+  asyncErrorHandler(updateProfile)
+);
+
+/* GET /forgot-password */
+router.get('/forgot-password', getForgotPw);
+
+/* PUT /forgot-password */
+router.put('/forgot-password', asyncErrorHandler(putForgotPw));
+
+/* GET /reset/:token */
+router.get('/reset/:token', asyncErrorHandler(getReset));
+
+/* PUT /reset/:token */
+router.put('/reset/:token', asyncErrorHandler(putReset));
 
 module.exports = router;
