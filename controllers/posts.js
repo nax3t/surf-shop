@@ -96,8 +96,8 @@ module.exports = {
 			for(const file of req.files) {
 				// add images to post.images array
 				post.images.push({
-					url: file.secure_url,
-					public_id: file.public_id
+					url: file.path,
+					public_id: file.filename
 				});
 			}
 		}
@@ -128,7 +128,7 @@ module.exports = {
 		for(const image of post.images) {
 			await cloudinary.uploader.destroy(image.public_id);
 		}
-		await post.remove();
+		await post.deleteOne();
 		req.session.success = 'Post deleted successfully!';
 		res.redirect('/posts');
 	}

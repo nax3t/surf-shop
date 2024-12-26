@@ -55,67 +55,31 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Flash messages middleware
-app.use((req, res, next) => {
-  // Add flash method to request object
-  req.flash = (type, message) => {
-    req.session.flash = req.session.flash || {};
-    req.session.flash[type] = message;
-  };
-  next();
-});
-
-// Configure Passport Local Strategy
-passport.use(new LocalStrategy({
-    usernameField: 'email',
-    passwordField: 'password'
-}, async (email, password, done) => {
-    try {
-        const user = await User.findOne({ email });
-        if (!user) {
-            return done(null, false, { message: 'Incorrect email.' });
-        }
-        
-        console.log('Found user:', user);
-        console.log('Attempting to compare:', password, 'with:', user.password);
-        
-        const isValid = await user.comparePassword(password);
-        if (!isValid) {
-            return done(null, false, { message: 'Incorrect password.' });
-        }
-        return done(null, user);
-    } catch (err) {
-        return done(err);
-    }
-}));
-
 passport.serializeUser((user, done) => {
-    done(null, user.id);
+  done(null, user.id);
 });
 
 passport.deserializeUser(async (id, done) => {
-    try {
-        const user = await User.findById(id);
-        done(null, user);
-    } catch (err) {
-        done(err);
-    }
+  try {
+    const user = await User.findById(id);
+    done(null, user);
+  } catch(err) {
+    done(err, null);
+  }
 });
 
 // Set local variables middleware
 app.use((req, res, next) => {
   res.locals.currentUser = req.user;
-  // Initialize flash messages
-  res.locals.success = '';
-  res.locals.error = '';
-  // Get flash messages and clear them
-  if (req.session.flash) {
-    res.locals.success = req.session.flash.success || '';
-    res.locals.error = req.session.flash.error || '';
-    delete req.session.flash;
-  }
-  // set default page title
+  // Set default page title
   res.locals.title = 'Surf Shop';
+  // Set success flash message
+  res.locals.success = req.session.success || '';
+  delete req.session.success;
+  // Set error flash message
+  res.locals.error = req.session.error || '';
+  delete req.session.error;
+  // Continue on to next middleware
   next();
 });
 
