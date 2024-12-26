@@ -80,7 +80,7 @@ module.exports = {
 			// loop over deleteImages
 			for(const public_id of deleteImages) {
 				// delete images from cloudinary
-				await cloudinary.v2.uploader.destroy(public_id);
+				await cloudinary.uploader.destroy(public_id);
 				// delete image from post.images
 				for(const image of post.images) {
 					if(image.public_id === public_id) {
@@ -126,7 +126,7 @@ module.exports = {
 	async postDestroy(req, res, next) {
 		const { post } = res.locals;
 		for(const image of post.images) {
-			await cloudinary.v2.uploader.destroy(image.public_id);
+			await cloudinary.uploader.destroy(image.public_id);
 		}
 		await post.remove();
 		req.session.success = 'Post deleted successfully!';

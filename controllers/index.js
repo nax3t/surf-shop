@@ -77,26 +77,26 @@ module.exports = {
   },
   // POST /login
   async postLogin(req, res, next) {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
     try {
-      // Find user by username
-      const user = await User.findOne({ username });
+      // Find user by email
+      const user = await User.findOne({ email });
       if (!user) {
-        req.session.error = "Invalid username or password.";
+        req.session.error = "Invalid email or password.";
         return res.redirect("/login");
       }
 
       // Check password
       const match = await bcrypt.compare(password, user.password);
       if (!match) {
-        req.session.error = "Invalid username or password.";
+        req.session.error = "Invalid email or password.";
         return res.redirect("/login");
       }
 
       // Log user in
       req.login(user, function (err) {
         if (err) return next(err);
-        req.session.success = `Welcome back, ${username}!`;
+        req.session.success = `Welcome back, ${user.username}!`;
         const redirectUrl = req.session.redirectTo || "/";
         delete req.session.redirectTo;
         res.redirect(redirectUrl);
@@ -136,7 +136,7 @@ module.exports = {
     // Handle image upload
     if (req.file) {
       if (user.image.public_id) {
-        await cloudinary.v2.uploader.destroy(user.image.public_id);
+        await cloudinary.uploader.destroy(user.image.public_id);
       }
       const { filename, path } = req.file;
       user.image = { url: path, public_id: filename };
