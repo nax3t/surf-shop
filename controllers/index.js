@@ -130,6 +130,10 @@ module.exports = {
 
     // Handle new password
     if (req.body.newPassword) {
+      if (req.body.newPassword !== req.body.passwordConfirmation) {
+        req.session.error = "New passwords must match!";
+        return res.redirect("/profile");
+      }
       user.password = req.body.newPassword;
     }
 
