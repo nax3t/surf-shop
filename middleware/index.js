@@ -7,7 +7,82 @@ const mapBoxToken = process.env.MAPBOX_TOKEN;
 const geocodingClient = mbxGeocoding({ accessToken: mapBoxToken });
 
 function escapeRegExp(string) {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function buildTextSearchQuery(search) {
+    if (!search) return null;
+    const regex = new RegExp(escapeRegExp(search), 'gi');
+    return {
+        $or: [
+            { title: regex },
+            { description: regex },
+            { location: regex }
+        ]
+    };
+}
+
+async function buildLocationQuery(locationData) {
+    if (!locationData) return null;
+    
+    let coordinates;
+    try {
+        coordinates = parseLocation(locationData);
+        if (!coordinates) {
+            const response = await geocodingClient
+                .forwardGeocode({
+                    query: locationData,
+                    limit: 1
+                })
+                .send();
+            coordinates = response.body.features[0].geometry.coordinates;
+        }
+    } catch (err) {
+        return null;
+    }
+
+    const maxDistance = (locationData.distance || 25) * 1609.34;
+    return {
+        geometry: {
+            $near: {
+                $geometry: {
+                    type: 'Point',
+                    coordinates
+                },
+                $maxDistance: maxDistance
+            }
+        }
+    };
+}
+
+function buildPriceRangeQuery(price) {
+    if (!price) return null;
+    const query = {};
+    if (price.min) query.$gte = price.min;
+    if (price.max) query.$lte = price.max;
+    return Object.keys(query).length ? { price: query } : null;
+}
+
+function buildRatingQuery(avgRating) {
+    return avgRating ? { avgRating: { $in: avgRating } } : null;
+}
+
+function parseLocation(location) {
+    try {
+        const parsed = JSON.parse(location);
+        if (Array.isArray(parsed) && parsed.length === 2) {
+            return parsed;
+        }
+        return null;
+    } catch {
+        return null;
+    }
+}
+
+function buildPaginationUrl(originalUrl) {
+    const url = new URL(originalUrl, 'http://localhost');
+    url.searchParams.delete('page');
+    return `${url.pathname}${url.search}${url.search ? '&' : '?'}page=`;
 }
 
 const middleware = {
@@ -40,17 +115,8 @@ const middleware = {
 		res.redirect('back');
 	},
 	isValidPassword: async (req, res, next) => {
-		const user = await User.findById(req.user._id);
-		const { currentPassword } = req.body;
-		
-		if (!currentPassword) {
-			middleware.deleteProfileImage(req);
-			req.session.error = 'Current password is required!';
-			return res.redirect('/profile');
-		}
-
-		const valid = await user.comparePassword(currentPassword);
-		if (valid) {
+		const { user } = await User.authenticate()(req.user.username, req.body.currentPassword);
+		if (user) {
 			res.locals.user = user;
 			next();
 		} else {
@@ -87,74 +153,29 @@ const middleware = {
 		if (req.file) await cloudinary.uploader.destroy(req.file.filename);
 	},
 	async searchAndFilterPosts(req, res, next) {
-		const queryKeys = Object.keys(req.query);
+        try {
+            const queryBuilders = {
+                search: buildTextSearchQuery,
+                location: buildLocationQuery,
+                price: buildPriceRangeQuery,
+                avgRating: buildRatingQuery
+            };
 
-		if(queryKeys.length) {
-			const dbQueries = [];
-			let { search, price, avgRating, location, distance } = req.query;
+            const dbQueries = await Promise.all(
+                Object.entries(req.query)
+                    .filter(([key]) => queryBuilders[key])
+                    .map(async ([key, value]) => await queryBuilders[key](value))
+            );
 
-			if (search) {
-				search = new RegExp(escapeRegExp(search), 'gi');
-				dbQueries.push({ $or: [
-						{ title: search },
-						{ description: search },
-						{ location: search }
-					]
-				});
-			}
-
-			if (location) {
-				let coordinates;
-				try {
-					if(typeof JSON.parse(location) === 'number') {
-						throw new Error;
-					}
-					location = JSON.parse(location);
-					coordinates = location;
-				} catch(err) {
-					const response = await geocodingClient
-						.forwardGeocode({
-							query: location,
-							limit: 1
-						})
-						.send();
-					coordinates = response.body.features[0].geometry.coordinates;
-				}
-				let maxDistance = distance || 25;
-				maxDistance *= 1609.34;
-				dbQueries.push({
-					geometry: {
-						$near: {
-							$geometry: {
-								type: 'Point',
-								coordinates
-							},
-							$maxDistance: maxDistance
-						}
-					}
-				});
-			}
-
-			if (price) {
-				if (price.min) dbQueries.push({ price: { $gte: price.min } });
-				if (price.max) dbQueries.push({ price: { $lte: price.max } });
-			}
-
-			if (avgRating) {
-				dbQueries.push({ avgRating: { $in: avgRating } });
-			}
-
-			res.locals.dbQuery = dbQueries.length ? { $and: dbQueries } : {};
-		}
-
-		res.locals.query = req.query;
-
-		queryKeys.splice(queryKeys.indexOf('page'), 1);
-		const delimiter = queryKeys.length ? '&' : '?';
-		res.locals.paginateUrl = req.originalUrl.replace(/(\?|\&)page=\d+/g, '') + `${delimiter}page=`;
-
-		next();
-	}
+            const validQueries = dbQueries.filter(Boolean);
+            res.locals.dbQuery = validQueries.length ? { $and: validQueries } : {};
+            res.locals.query = req.query;
+            res.locals.paginateUrl = buildPaginationUrl(req.originalUrl);
+            next();
+        } catch (err) {
+            next(err);
+        }
+    }
 };
 
 module.exports = middleware;

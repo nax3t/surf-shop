@@ -9,15 +9,19 @@ module.exports = {
 	async postIndex(req, res, next) {
 		const { dbQuery } = res.locals;
 		delete res.locals.dbQuery;
-		let posts = await Post.paginate(dbQuery, {
+		
+		let posts = await Post.paginate(dbQuery || {}, {
 			page: req.query.page || 1,
 			limit: 10,
 			sort: '-_id'
 		});
 		posts.page = Number(posts.page);
-		if (!posts.docs.length && res.locals.query) {
+		
+		// Only show no results message if there was an actual search
+		if (!posts.docs.length && Object.keys(req.query).length) {
 			res.locals.error = 'No results match that query.';
 		}
+		
 		res.render('posts/index', { 
 			posts, 
 			mapBoxToken, 

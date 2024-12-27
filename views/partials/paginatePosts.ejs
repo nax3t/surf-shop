@@ -1,15 +1,27 @@
 <ul class="pagination" style="margin: 20px auto; flex-wrap: wrap">
-<% if(posts.page - 1) { %>
-	<li class="page-item my-1"><a class="page-link" href="<%= paginateUrl %><%= posts.page - 1 %>">Prev</a></li>
-<% } %>
-<% if (posts.pages > 1 && posts.docs.length) { %>
-<% for(let i = 1; i <= posts.pages; i++) { %>
-	<li class="page-item my-1"><a class="page-link" href="<%= paginateUrl %><%= i %>"
-		 <%= i === posts.page ? 'style=color:#000;' : '' %>
-		><%= i %></a></li>
-<% } %>
-<% } %>
-<% if((posts.page + 1) <= posts.pages) { %>
-	<li class="page-item my-1"><a class="page-link" href="<%= paginateUrl %><%= posts.page + 1 %>">Next</a></li>
-<% } %>
-</ul>
+	<% if(posts.page - 1) { %>
+		<li class="page-item my-1"><a class="page-link" href="<%= paginateUrl %>1">First</a></li>
+		<li class="page-item my-1"><a class="page-link" href="<%= paginateUrl %><%= posts.page - 1 %>">Prev</a></li>
+	<% } %>
+	
+	<% 
+		let startPage = Math.max(1, posts.page - 4);
+		let endPage = Math.min(posts.totalPages, startPage + 9);
+		
+		// Adjust startPage if we're near the end
+		if (endPage - startPage < 9) {
+			startPage = Math.max(1, endPage - 9);
+		}
+	%>
+	
+	<% for(let i = startPage; i <= endPage; i++) { %>
+		<li class="page-item my-1"><a class="page-link" href="<%= paginateUrl %><%= i %>"
+			<%= i === posts.page ? 'style=color:#000;' : '' %>
+			><%= i %></a></li>
+	<% } %>
+	
+	<% if((posts.page + 1) <= posts.totalPages) { %>
+		<li class="page-item my-1"><a class="page-link" href="<%= paginateUrl %><%= posts.page + 1 %>">Next</a></li>
+		<li class="page-item my-1"><a class="page-link" href="<%= paginateUrl %><%= posts.totalPages %>">Last</a></li>
+	<% } %>
+	</ul>
