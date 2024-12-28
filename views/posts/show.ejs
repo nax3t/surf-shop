@@ -90,8 +90,8 @@
       </div>
       <% } %>
       <div class="reviewBlock my-4">
-        <% if(currentUser) { %>
-        <h2>Create a Review</h2>
+        <% if(currentUser && !hasReview) { %>
+        <h2>Write a review</h2>
         <form action="/posts/<%= post.id %>/reviews" method="POST">
           <textarea
             name="review[body]"
@@ -135,11 +135,11 @@
             </button>
           </div>
         </form>
-        <% } else { %>
+        <% } else if (!currentUser) { %>
         <a
           class="btn btn-info waves-effect waves-light m-r-10"
           href="/login?returnTo=true"
-          >Create a Review</a
+          >Write a review</a
         >
         <% } %>
       </div>
