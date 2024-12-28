@@ -7,6 +7,12 @@ const { cloudinary } = require("../cloudinary");
 const { deleteProfileImage } = require("../middleware");
 const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
+const sgMail = require("@sendgrid/mail");
+const emailEnabled = !!process.env.SENDGRID_API_KEY;
+
+if (emailEnabled) {
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+}
 
 module.exports = {
   // GET /
@@ -73,7 +79,7 @@ module.exports = {
   getLogin(req, res, next) {
     if (req.isAuthenticated()) return res.redirect("/");
     if (req.query.redirectTo) req.session.redirectTo = req.headers.referer;
-    res.render("login", { title: "Login" });
+    res.render("login", { title: "Login", isBanner: false });
   },
   // POST /login
   async postLogin(req, res, next) {
@@ -168,7 +174,7 @@ module.exports = {
 
     const msg = {
       to: email,
-      from: "Surf Shop Admin <your@email.com>",
+      from: `Surf Shop Admin <${process.env.FROM_EMAIL}>`,
       subject: "Surf Shop - Forgot Password / Reset",
       text: `You are receiving this because you (or someone else)
       have requested the reset of the password for your account.
@@ -179,10 +185,17 @@ module.exports = {
       your password will remain unchanged.`.replace(/     /g, ""),
     };
 
-    // Log the email instead of sending it
-    console.log("Password Reset Email:", msg);
+    if (emailEnabled) {
+      await sgMail.send(msg);
+      req.session.success = `An email has been sent to ${email} with further instructions.`;
+    } else {
+      console.log("Email would have been sent:");
+      console.log("To:", msg.to);
+      console.log("Subject:", msg.subject);
+      console.log("Text:", msg.text);
+      req.session.success = `Email sending is disabled. Check console for email content.`;
+    }
 
-    req.session.success = `An email has been sent to ${email} with further instructions.`;
     res.redirect("/forgot-password");
   },
   async getReset(req, res, next) {
@@ -225,7 +238,7 @@ module.exports = {
 
     const msg = {
       to: user.email,
-      from: "Surf Shop Admin <your@email.com>",
+      from: `Surf Shop Admin <${process.env.FROM_EMAIL}>`,
       subject: "Surf Shop - Password Changed",
       text: `Hello,
       This email is to confirm that the password for your account has just been changed.
@@ -235,10 +248,17 @@ module.exports = {
       ),
     };
 
-    // Log the email instead of sending it
-    console.log("Password Changed Email:", msg);
+    if (emailEnabled) {
+      await sgMail.send(msg);
+      req.session.success = `Password successfully updated!`;
+    } else {
+      console.log("Email would have been sent:");
+      console.log("To:", msg.to);
+      console.log("Subject:", msg.subject);
+      console.log("Text:", msg.text);
+      req.session.success = `Email sending is disabled. Check console for email content.`;
+    }
 
-    req.session.success = "Password successfully updated!";
     res.redirect("/");
   },
 };
