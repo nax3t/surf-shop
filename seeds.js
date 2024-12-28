@@ -25,7 +25,7 @@ async function seedPosts() {
 				author: '5bb27cd1f986d278582aa58c',
 				images: [
 					{
-						url: 'https://res.cloudinary.com/devsprout/image/upload/v1561315599/surf-shop/surfboard.jpg'
+						url: 'https://res.cloudinary.com/devsprout/image/upload/v1735357997/surf-shop/surfboarde5b254dc6341a0b35cfde3b845cd8bc5.jpg'
 					}
 				]
 			});
