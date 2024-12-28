@@ -72,7 +72,7 @@ module.exports = {
   // GET /login
   getLogin(req, res, next) {
     if (req.isAuthenticated()) return res.redirect("/");
-    if (req.session.redirectTo) req.session.redirectTo = req.headers.referer;
+    if (req.query.redirectTo) req.session.redirectTo = req.headers.referer;
     res.render("login", { title: "Login" });
   },
   // POST /login

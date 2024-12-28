@@ -41,15 +41,11 @@ async function buildLocationQuery(locationData) {
         return null;
     }
 
-    const maxDistance = (locationData.distance || 25) * 1609.34;
+    const maxDistance = (locationData.distance || 25) / 3963.2; // Convert miles to radians
     return {
         geometry: {
-            $near: {
-                $geometry: {
-                    type: 'Point',
-                    coordinates
-                },
-                $maxDistance: maxDistance
+            $geoWithin: {
+                $centerSphere: [coordinates, maxDistance]
             }
         }
     };
