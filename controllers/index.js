@@ -72,7 +72,7 @@ module.exports = {
   // GET /login
   getLogin(req, res, next) {
     if (req.isAuthenticated()) return res.redirect("/");
-    if (req.query.returnTo) req.session.redirectTo = req.headers.referer;
+    if (req.session.redirectTo) req.session.redirectTo = req.headers.referer;
     res.render("login", { title: "Login" });
   },
   // POST /login
@@ -92,13 +92,12 @@ module.exports = {
         req.session.error = "Invalid email or password.";
         return res.redirect("/login");
       }
-
+      const redirectUrl = req.session.redirectTo || "/";
+      delete req.session.redirectTo;
       // Log user in
       req.login(user, function (err) {
         if (err) return next(err);
         req.session.success = `Welcome back, ${user.username}!`;
-        const redirectUrl = req.session.redirectTo || "/";
-        delete req.session.redirectTo;
         res.redirect(redirectUrl);
       });
     } catch (err) {
