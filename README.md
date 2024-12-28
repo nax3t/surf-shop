@@ -20,17 +20,18 @@ A modern full-stack application for listing and viewing surfboards. Built with N
 
 ## Environment Variables
 
-Create a `.env` file in the root directory with the following variables:
+Create a `.env` file in the root directory with the following variables (`cp example.env .env`):
 
 ```env
-CLOUDINARY_SECRET=your_cloudinary_secret
-CLOUDINARY_KEY=your_cloudinary_key
-CLOUDINARY_NAME=your_cloudinary_name
-MAPBOX_TOKEN=your_mapbox_token
-SENDGRID_API_KEY=your_sendgrid_api_key
-FROM_EMAIL=your_verified_sender_email
+CLOUDINARY_SECRET=
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_KEY=
+MAPBOX_TOKEN=
+SENDGRID_API_KEY=
+FROM_EMAIL=
 ```
 
+*Note:* Leave SENDGRID_API_KEY= empty if you don't have a SendGrid account setup. When you trigger the sending of an email (password reset), the application will log the email to the console. 
 
 ## Installation
 
@@ -59,7 +60,7 @@ node seeds.js
 
 5. Start the application: 
 ```bash
-npm run dev
+npm start
 ```
 
 The application will be available at [http://localhost:3000](http://localhost:3000).
